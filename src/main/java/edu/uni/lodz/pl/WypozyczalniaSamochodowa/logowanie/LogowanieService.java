@@ -11,7 +11,8 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class LogowanieService {
-    PracownikRepository pracownikRepository;
+
+    private final PracownikRepository pracownikRepository;
 
     public final Optional<Pracownik> zaloguj(String login, String password) {
         List<Pracownik> list = pracownikRepository.findAllByLoginAndPassword(login, password);

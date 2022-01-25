@@ -2,26 +2,25 @@ package edu.uni.lodz.pl.WypozyczalniaSamochodowa.logowanie;
 
 import edu.uni.lodz.pl.WypozyczalniaSamochodowa.main.Main;
 import edu.uni.lodz.pl.WypozyczalniaSamochodowa.pracownik.Pracownik;
+import edu.uni.lodz.pl.WypozyczalniaSamochodowa.pracownik.PracownikRepository;
 import org.springframework.stereotype.Component;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.Optional;
 
 @Component
 public class Logowanie extends JFrame {
     private final Main main;
-    private final LogowanieService logowanieService;
+    private final PracownikRepository pracownikRepository;
     private JPanel panel;
     private JButton buttonZaloguj;
     private JButton buttonAnuluj;
     private JTextField textFieldLogin;
     private JTextField textFieldHaslo;
 
-    public Logowanie(Main main, LogowanieService logowanieService) {
-        this.logowanieService = logowanieService;
+    public Logowanie(Main main, PracownikRepository pracownikRepository) {
+        this.pracownikRepository = pracownikRepository;
         main.setVisible(false);
         this.main = main;
 
@@ -33,26 +32,17 @@ public class Logowanie extends JFrame {
         pack();
         setLocationRelativeTo(null);
 
-        buttonZaloguj.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                zaloguj();
-            }
-        });
-        buttonAnuluj.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                anuluj();
-            }
-        });
+        buttonZaloguj.addActionListener(e -> zaloguj());
+        buttonAnuluj.addActionListener(e -> anuluj());
     }
 
     private void zaloguj() {
-        Optional<Pracownik> pracownik = logowanieService.zaloguj(textFieldLogin.getText(), textFieldHaslo.getText());
-        if (pracownik.isEmpty()) {
+        Optional<Pracownik> pracownikOptional = pracownikRepository.findByLoginAndHaslo(textFieldLogin.getText(), textFieldHaslo.getText());
+        if (pracownikOptional.isEmpty()) {
+            JOptionPane.showMessageDialog(panel, "Zła nazwa użytkownika lub hasło");
             return;
         }
-        main.setZalogowanyPracownik(pracownik.get());
+        main.setZalogowanyPracownik(pracownikOptional.get());
         main.setVisible(true);
         dispose();
     }

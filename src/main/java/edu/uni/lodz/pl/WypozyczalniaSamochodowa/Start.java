@@ -6,27 +6,30 @@ import edu.uni.lodz.pl.WypozyczalniaSamochodowa.model.Plec;
 import edu.uni.lodz.pl.WypozyczalniaSamochodowa.pracownik.Pracownik;
 import edu.uni.lodz.pl.WypozyczalniaSamochodowa.pracownik.PracownikRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.util.List;
 
 @SpringBootApplication
 @RequiredArgsConstructor
 public class Start implements CommandLineRunner {
-    private final Main main;
     private final PracownikRepository pracownikRepository;
 
     public static void main(String[] args) {
         new SpringApplicationBuilder(Start.class).headless(false).run(args);
     }
 
+
     @Override
     public void run(String... args) {
-        Logowanie logowanie = new Logowanie(main, pracownikRepository);
+        Logowanie logowanie = new Logowanie(pracownikRepository);
         logowanie.setVisible(true);
-        dodajPracownikow();
+       //jeżeli chcecie dodać pracowników do bazy odkomentujcie linijke poniżej
+        //dodajPracownikow();
     }
 
     private void dodajPracownikow() {

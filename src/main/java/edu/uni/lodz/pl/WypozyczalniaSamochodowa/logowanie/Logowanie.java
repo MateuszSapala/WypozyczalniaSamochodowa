@@ -7,22 +7,21 @@ import org.springframework.stereotype.Component;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Arrays;
 import java.util.Optional;
 
 @Component
 public class Logowanie extends JFrame {
-    private final Main main;
     private final PracownikRepository pracownikRepository;
     private JPanel panel;
     private JButton buttonZaloguj;
     private JButton buttonAnuluj;
     private JTextField textFieldLogin;
-    private JTextField textFieldHaslo;
+    private JPasswordField passwordField;
 
-    public Logowanie(Main main, PracownikRepository pracownikRepository) {
+
+    public Logowanie(PracownikRepository pracownikRepository) {
         this.pracownikRepository = pracownikRepository;
-        main.setVisible(false);
-        this.main = main;
 
         setTitle("Logowanie");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -37,17 +36,16 @@ public class Logowanie extends JFrame {
     }
 
     private void zaloguj() {
-        Optional<Pracownik> pracownikOptional = pracownikRepository.findByLoginAndHaslo(textFieldLogin.getText(), textFieldHaslo.getText());
+        Optional<Pracownik> pracownikOptional = pracownikRepository.findByLoginAndHaslo(textFieldLogin.getText(), String.copyValueOf(passwordField.getPassword()));
         if (pracownikOptional.isEmpty()) {
             JOptionPane.showMessageDialog(panel, "Zła nazwa użytkownika lub hasło");
             return;
         }
-        main.setZalogowanyPracownik(pracownikOptional.get());
-        main.setVisible(true);
+        new Main(pracownikOptional.get());
         dispose();
     }
 
     private void anuluj() {
-        dispose();
+        System.exit(0);
     }
 }

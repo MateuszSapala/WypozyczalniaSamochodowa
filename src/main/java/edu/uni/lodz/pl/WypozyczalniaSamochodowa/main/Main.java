@@ -7,20 +7,24 @@ import org.springframework.stereotype.Component;
 import javax.swing.*;
 import java.awt.*;
 
-@Component
+
 public class Main extends JFrame {
     @Setter
     private Pracownik zalogowanyPracownik;
     private JPanel panel;
-    private JButton button1;
+    private JTabbedPane tabbedPane1;
+    private JLabel jlabel;
 
-    public Main() {
+    public Main(Pracownik zalogowanyPracownik) {
         setTitle("Wypożyczalnia samochodowa");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setPreferredSize(new Dimension(300, 250));
+        setPreferredSize(new Dimension(1500, 800));
         setResizable(false);
         add(panel);
         pack();
         setLocationRelativeTo(null);
+        this.zalogowanyPracownik = zalogowanyPracownik;
+        this.setVisible(true);
+        jlabel.setText(zalogowanyPracownik.getNazwisko());
     }
 }

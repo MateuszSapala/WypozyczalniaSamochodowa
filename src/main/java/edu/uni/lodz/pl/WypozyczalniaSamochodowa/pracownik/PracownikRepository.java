@@ -15,4 +15,7 @@ import java.util.Optional;
 public interface PracownikRepository extends JpaRepository<Pracownik, Integer> {
     @Query("SELECT p FROM Pracownik p WHERE(p.login=:login AND p.haslo=:haslo)")
     Optional<Pracownik> findAllByLoginAndPassword(@Param("login") String login, @Param("haslo") String haslo);
+
+    //Działa dokładnie tak samo jak findAllByLoginAndPassword
+    Optional<Pracownik> findByLoginAndHaslo (String login, String haslo);
 }

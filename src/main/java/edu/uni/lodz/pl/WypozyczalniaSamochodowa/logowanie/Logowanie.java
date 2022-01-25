@@ -37,7 +37,7 @@ public class Logowanie extends JFrame {
     }
 
     private void zaloguj() {
-        Optional<Pracownik> pracownikOptional = pracownikRepository.findAllByLoginAndPassword(textFieldLogin.getText(), textFieldHaslo.getText());
+        Optional<Pracownik> pracownikOptional = pracownikRepository.findByLoginAndHaslo(textFieldLogin.getText(), textFieldHaslo.getText());
         if (pracownikOptional.isEmpty()) {
             JOptionPane.showMessageDialog(panel, "Zła nazwa użytkownika lub hasło");
             return;

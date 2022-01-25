@@ -23,7 +23,7 @@ public class Start implements CommandLineRunner {
     }
 
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args) {
         Logowanie logowanie = new Logowanie(main, pracownikRepository);
         logowanie.setVisible(true);
         dodajPracownikow();

@@ -7,8 +7,6 @@ import org.springframework.stereotype.Component;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.Optional;
 
 @Component
@@ -34,24 +32,15 @@ public class Logowanie extends JFrame {
         pack();
         setLocationRelativeTo(null);
 
-        buttonZaloguj.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                zaloguj();
-            }
-        });
-        buttonAnuluj.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                anuluj();
-            }
-        });
+        buttonZaloguj.addActionListener(e -> zaloguj());
+        buttonAnuluj.addActionListener(e -> anuluj());
     }
 
     private void zaloguj() {
         Optional<Pracownik> pracownikOptional = pracownikRepository.findAllByLoginAndPassword(textFieldLogin.getText(), textFieldHaslo.getText());
         if (pracownikOptional.isEmpty()) {
             JOptionPane.showMessageDialog(panel, "Zła nazwa użytkownika lub hasło");
+            return;
         }
         main.setZalogowanyPracownik(pracownikOptional.get());
         main.setVisible(true);

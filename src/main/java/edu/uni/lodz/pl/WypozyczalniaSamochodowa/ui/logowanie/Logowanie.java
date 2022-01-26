@@ -1,8 +1,8 @@
-package edu.uni.lodz.pl.WypozyczalniaSamochodowa.logowanie;
+package edu.uni.lodz.pl.WypozyczalniaSamochodowa.ui.logowanie;
 
-import edu.uni.lodz.pl.WypozyczalniaSamochodowa.main.Main;
-import edu.uni.lodz.pl.WypozyczalniaSamochodowa.pracownik.Pracownik;
-import edu.uni.lodz.pl.WypozyczalniaSamochodowa.pracownik.PracownikRepository;
+import edu.uni.lodz.pl.WypozyczalniaSamochodowa.model.Repos;
+import edu.uni.lodz.pl.WypozyczalniaSamochodowa.model.pracownik.Pracownik;
+import edu.uni.lodz.pl.WypozyczalniaSamochodowa.ui.main.Main;
 import org.springframework.stereotype.Component;
 
 import javax.swing.*;
@@ -11,7 +11,7 @@ import java.util.Optional;
 
 @Component
 public class Logowanie extends JFrame {
-    private final PracownikRepository pracownikRepository;
+    private final Repos repos;
     private JPanel panel;
     private JButton buttonZaloguj;
     private JButton buttonAnuluj;
@@ -19,8 +19,8 @@ public class Logowanie extends JFrame {
     private JPasswordField passwordField;
 
 
-    public Logowanie(PracownikRepository pracownikRepository) {
-        this.pracownikRepository = pracownikRepository;
+    public Logowanie(Repos repos) {
+        this.repos = repos;
 
         setTitle("Logowanie");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -35,12 +35,12 @@ public class Logowanie extends JFrame {
     }
 
     private void zaloguj() {
-        Optional<Pracownik> pracownikOptional = pracownikRepository.findByLoginAndHaslo(textFieldLogin.getText(), String.copyValueOf(passwordField.getPassword()));
+        Optional<Pracownik> pracownikOptional = repos.getPracownikRepository().findByLoginAndHaslo(textFieldLogin.getText(), String.copyValueOf(passwordField.getPassword()));
         if (pracownikOptional.isEmpty()) {
             JOptionPane.showMessageDialog(panel, "Zła nazwa użytkownika lub hasło");
             return;
         }
-        new Main(pracownikRepository, pracownikOptional.get());
+        new Main(repos, pracownikOptional.get());
         dispose();
     }
 

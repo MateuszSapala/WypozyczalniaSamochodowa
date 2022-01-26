@@ -1,7 +1,7 @@
-package edu.uni.lodz.pl.WypozyczalniaSamochodowa.main;
+package edu.uni.lodz.pl.WypozyczalniaSamochodowa.ui.main;
 
-import edu.uni.lodz.pl.WypozyczalniaSamochodowa.pracownik.Pracownik;
-import edu.uni.lodz.pl.WypozyczalniaSamochodowa.pracownik.PracownikRepository;
+import edu.uni.lodz.pl.WypozyczalniaSamochodowa.model.Repos;
+import edu.uni.lodz.pl.WypozyczalniaSamochodowa.model.pracownik.Pracownik;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableColumnModel;
@@ -10,7 +10,7 @@ import java.awt.*;
 
 
 public class Main extends JFrame {
-    private final PracownikRepository pracownikRepository;
+    private final Repos repos;
     private Pracownik zalogowanyPracownik;
     private JPanel panel;
     private JTabbedPane tabbedPane1;
@@ -22,8 +22,8 @@ public class Main extends JFrame {
     private DefaultTableColumnModel model;
     private JLabel jlabel;
 
-    public Main(PracownikRepository pracownikRepository, Pracownik zalogowanyPracownik) {
-        this.pracownikRepository = pracownikRepository;
+    public Main(Repos repos, Pracownik zalogowanyPracownik) {
+        this.repos = repos;
         this.zalogowanyPracownik = zalogowanyPracownik;
         setTitle("Wypożyczalnia samochodowa");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -38,7 +38,7 @@ public class Main extends JFrame {
 
     public void zaladujDane() {
         String[] columnNames = {"Imie", "Nazwisko"};
-        Object[][] data = pracownikRepository
+        Object[][] data = repos.getPracownikRepository()
                 .findAll()
                 .stream()
                 .map(p -> new Object[]{p.getImie(), p.getNazwisko()})

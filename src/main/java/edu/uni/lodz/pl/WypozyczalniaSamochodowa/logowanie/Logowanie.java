@@ -7,7 +7,6 @@ import org.springframework.stereotype.Component;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.Arrays;
 import java.util.Optional;
 
 @Component
@@ -41,7 +40,7 @@ public class Logowanie extends JFrame {
             JOptionPane.showMessageDialog(panel, "Zła nazwa użytkownika lub hasło");
             return;
         }
-        new Main(pracownikOptional.get());
+        new Main(pracownikRepository, pracownikOptional.get());
         dispose();
     }
 

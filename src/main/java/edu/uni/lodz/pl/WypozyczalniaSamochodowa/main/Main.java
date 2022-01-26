@@ -1,16 +1,16 @@
 package edu.uni.lodz.pl.WypozyczalniaSamochodowa.main;
 
 import edu.uni.lodz.pl.WypozyczalniaSamochodowa.pracownik.Pracownik;
-import lombok.Setter;
-import org.springframework.stereotype.Component;
+import edu.uni.lodz.pl.WypozyczalniaSamochodowa.pracownik.PracownikRepository;
 
 import javax.swing.*;
-import javax.swing.table.*;
+import javax.swing.table.DefaultTableColumnModel;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 
 
 public class Main extends JFrame {
-    @Setter
+    private final PracownikRepository pracownikRepository;
     private Pracownik zalogowanyPracownik;
     private JPanel panel;
     private JTabbedPane tabbedPane1;
@@ -22,26 +22,28 @@ public class Main extends JFrame {
     private DefaultTableColumnModel model;
     private JLabel jlabel;
 
-    public Main(Pracownik zalogowanyPracownik) {
+    public Main(PracownikRepository pracownikRepository, Pracownik zalogowanyPracownik) {
+        this.pracownikRepository = pracownikRepository;
+        this.zalogowanyPracownik = zalogowanyPracownik;
         setTitle("Wypożyczalnia samochodowa");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setPreferredSize(new Dimension(1500, 800));
         setResizable(false);
         add(panel);
-
-        this.zalogowanyPracownik = zalogowanyPracownik;
-        String[] columnNames = {"Imie", "Nazwisko"};
-        Object[][] data = {
-                {"Adam", "Nowak"},
-                {"Kasia", "Kowalska"}
-        };
-        DefaultTableModel defaultTableModel = new DefaultTableModel(data, columnNames);
-        table1.setModel(defaultTableModel);
+        zaladujDane();
         pack();
         setLocationRelativeTo(null);
         this.setVisible(true);
-
-
     }
 
+    public void zaladujDane() {
+        String[] columnNames = {"Imie", "Nazwisko"};
+        Object[][] data = pracownikRepository
+                .findAll()
+                .stream()
+                .map(p -> new Object[]{p.getImie(), p.getNazwisko()})
+                .toArray(Object[][]::new);
+        DefaultTableModel defaultTableModel = new DefaultTableModel(data, columnNames);
+        table1.setModel(defaultTableModel);
+    }
 }

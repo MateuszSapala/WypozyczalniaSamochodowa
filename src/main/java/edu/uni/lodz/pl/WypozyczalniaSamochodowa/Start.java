@@ -30,6 +30,7 @@ public class Start implements CommandLineRunner {
         logowanie.setVisible(true);
        //jeżeli chcecie dodać pracowników do bazy odkomentujcie linijke poniżej
         //dodajPracownikow();
+        //dsadsa
     }
 
     private void dodajPracownikow() {

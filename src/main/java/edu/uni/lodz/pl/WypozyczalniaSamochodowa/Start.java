@@ -3,6 +3,7 @@ package edu.uni.lodz.pl.WypozyczalniaSamochodowa;
 import edu.uni.lodz.pl.WypozyczalniaSamochodowa.model.Plec;
 import edu.uni.lodz.pl.WypozyczalniaSamochodowa.model.Repos;
 import edu.uni.lodz.pl.WypozyczalniaSamochodowa.model.godziny_pracy.GodzinyPracy;
+import edu.uni.lodz.pl.WypozyczalniaSamochodowa.model.klient.Klient;
 import edu.uni.lodz.pl.WypozyczalniaSamochodowa.model.pracownik.Pracownik;
 import edu.uni.lodz.pl.WypozyczalniaSamochodowa.ui.logowanie.Logowanie;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,7 @@ public class Start implements CommandLineRunner {
         Logowanie logowanie = new Logowanie(repos);
         logowanie.setVisible(true);
         dodajPracownikowJesliIchNieMa();
+        dodajKlientowJesliIchNieMa();
     }
 
     private void dodajPracownikowJesliIchNieMa() {
@@ -39,9 +41,18 @@ public class Start implements CommandLineRunner {
         GodzinyPracy g2 = new GodzinyPracy(start, end, start, end, start, end, start, end, start, end, start, end);
         GodzinyPracy g3 = new GodzinyPracy(start, end, start, end, start, end, start, end, start, end, start, end);
         Pracownik p1 = new Pracownik("Adam", "Nowak", "32454320034", "admin", "pass", Plec.MEZCZYZNA, g1);
-        Pracownik p2 = new Pracownik("Tomasz", "kowalski", "35653354198", "user1", "pass1", Plec.MEZCZYZNA, g2);
-        Pracownik p3 = new Pracownik("Anna", "Nowakowska", "32565348453", "user2", "pass2", Plec.KOBIETA, g3);
+        Pracownik p2 = new Pracownik("Tomasz", "Kowalski", "35653354198", "employee1", "pass1", Plec.MEZCZYZNA, g2);
+        Pracownik p3 = new Pracownik("Anna", "Nowakowska", "32565348453", "employee2", "pass2", Plec.KOBIETA, g3);
         repos.getGodzinyPracyRepository().saveAll(List.of(g1, g2, g3));
         repos.getPracownikRepository().saveAll(List.of(p1, p2, p3));
+    }
+
+    private void dodajKlientowJesliIchNieMa() {
+        if (!repos.getKlientRepository().findAll().isEmpty()) {
+            return;
+        }
+        Klient k1 = new Klient("Filip", "Sadowski", "5728540954", "user1", "passuser1", Plec.MEZCZYZNA);
+        Klient k2 = new Klient("Jan", "Pach", "27650193845", "user2", "passuser2", Plec.MEZCZYZNA);
+        repos.getKlientRepository().saveAll(List.of(k1, k2));
     }
 }

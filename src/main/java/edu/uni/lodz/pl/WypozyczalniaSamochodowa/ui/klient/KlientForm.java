@@ -2,12 +2,11 @@ package edu.uni.lodz.pl.WypozyczalniaSamochodowa.ui.klient;
 
 import edu.uni.lodz.pl.WypozyczalniaSamochodowa.model.Repos;
 import edu.uni.lodz.pl.WypozyczalniaSamochodowa.model.klient.Klient;
-import edu.uni.lodz.pl.WypozyczalniaSamochodowa.model.pracownik.Pracownik;
 
 import javax.swing.*;
 import java.awt.*;
 
-public class KlientForm extends JFrame{
+public class KlientForm extends JFrame {
     private final Repos repos;
     private Klient zalogowanyKlient;
     private JPanel panel;

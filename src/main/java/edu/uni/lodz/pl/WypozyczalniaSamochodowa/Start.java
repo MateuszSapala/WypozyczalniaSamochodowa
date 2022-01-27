@@ -2,6 +2,10 @@ package edu.uni.lodz.pl.WypozyczalniaSamochodowa;
 
 import edu.uni.lodz.pl.WypozyczalniaSamochodowa.model.Plec;
 import edu.uni.lodz.pl.WypozyczalniaSamochodowa.model.Repos;
+import edu.uni.lodz.pl.WypozyczalniaSamochodowa.model.auto.Auto;
+import edu.uni.lodz.pl.WypozyczalniaSamochodowa.model.auto.Nadwozie;
+import edu.uni.lodz.pl.WypozyczalniaSamochodowa.model.auto.Paliwo;
+import edu.uni.lodz.pl.WypozyczalniaSamochodowa.model.auto.Skrzynia;
 import edu.uni.lodz.pl.WypozyczalniaSamochodowa.model.godziny_pracy.GodzinyPracy;
 import edu.uni.lodz.pl.WypozyczalniaSamochodowa.model.klient.Klient;
 import edu.uni.lodz.pl.WypozyczalniaSamochodowa.model.pracownik.Pracownik;
@@ -27,14 +31,19 @@ public class Start implements CommandLineRunner {
     public void run(String... args) {
         Logowanie logowanie = new Logowanie(repos);
         logowanie.setVisible(true);
-        dodajPracownikowJesliIchNieMa();
-        dodajKlientowJesliIchNieMa();
+        dodajDane();
     }
 
-    private void dodajPracownikowJesliIchNieMa() {
+    private void dodajDane() {
         if (!repos.getPracownikRepository().findAll().isEmpty()) {
             return;
         }
+        dodajPracownikow();
+        dodajKlientow();
+        dodajAuta();
+    }
+
+    private void dodajPracownikow() {
         Time start = new Time(8, 0, 0);
         Time end = new Time(16, 0, 0);
         GodzinyPracy g1 = new GodzinyPracy(start, end, start, end, start, end, start, end, start, end, start, end);
@@ -47,12 +56,18 @@ public class Start implements CommandLineRunner {
         repos.getPracownikRepository().saveAll(List.of(p1, p2, p3));
     }
 
-    private void dodajKlientowJesliIchNieMa() {
+    private void dodajKlientow() {
         if (!repos.getKlientRepository().findAll().isEmpty()) {
             return;
         }
         Klient k1 = new Klient("Filip", "Sadowski", "5728540954", "user1", "passuser1", Plec.MEZCZYZNA);
         Klient k2 = new Klient("Jan", "Pach", "27650193845", "user2", "passuser2", Plec.MEZCZYZNA);
         repos.getKlientRepository().saveAll(List.of(k1, k2));
+    }
+
+    private void dodajAuta() {
+        Auto a1 = new Auto("Audi", "A7", Nadwozie.SEDAN, Paliwo.BENZYNA, Skrzynia.AUTOMATYCZNA, 2020, 150);
+        Auto a2 = new Auto("Volkswagen", "Passat", Nadwozie.SEDAN, Paliwo.DIESEL, Skrzynia.MANUALNA, 2015, 100);
+        repos.getAutoRepository().saveAll(List.of(a1, a2));
     }
 }

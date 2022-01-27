@@ -1,15 +1,18 @@
 package edu.uni.lodz.pl.WypozyczalniaSamochodowa.ui.main;
 
 import edu.uni.lodz.pl.WypozyczalniaSamochodowa.model.Repos;
+import edu.uni.lodz.pl.WypozyczalniaSamochodowa.model.auto.Auto;
 import lombok.RequiredArgsConstructor;
 
+import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 public class AutoService {
     private final Repos repos;
 
-    public DefaultTableModel tabelaAuta(){
+    public DefaultTableModel tabelaAuta() {
         String[] columnNames = {"Id", "Cena za dzien", "Marka", "Model", "Paliwo", "Rok produkcji", "Skrzynia"};
         Object[][] data = repos.getAutoRepository()
                 .findAll()
@@ -19,19 +22,17 @@ public class AutoService {
         return new DefaultTableModel(data, columnNames);
     }
 
-    public void dodajAuto(){
-
+    public Auto pobierzWybraneAutoZTabeli(JTable tableAuta, JPanel panel) {
+        if (tableAuta.getSelectedRow() < 0) {
+            JOptionPane.showMessageDialog(panel, "Nie wybrano wiersza");
+            return null;
+        }
+        Integer id = (int) tableAuta.getValueAt(tableAuta.getSelectedRow(), 0);
+        Optional<Auto> auto = repos.getAutoRepository().findById(id);
+        if (auto.isEmpty()) {
+            JOptionPane.showMessageDialog(panel, "Auta nie ma w bazie");
+            return null;
+        }
+        return auto.get();
     }
-
-    public void edytujAuto(){
-
-    }
-
-    public void aktualizujAuto(){
-
-    }
-
-    public void czytajAuto(Integer id){
-
-    };
 }

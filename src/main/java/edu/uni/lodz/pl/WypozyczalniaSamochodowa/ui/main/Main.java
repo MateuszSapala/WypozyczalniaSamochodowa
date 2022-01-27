@@ -13,6 +13,7 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Calendar;
 import java.util.Optional;
 
 
@@ -132,7 +133,42 @@ public class Main extends JFrame {
         comboBoxAutoSkrzynia.setSelectedItem(auto.getSkrzynia());
     }
 
+    private boolean sprawdzInputUzytkownika() {
+        try {
+            int cena = Integer.parseInt(textFieldAutoCenaZaDzien.getText());
+            if (cena < 0) {
+                throw new Exception();
+            }
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(panel, "Podano nieprawidłową cenę za dzień");
+            return false;
+        }
+
+        if (textFieldAutoMarka.getText().length() < 3) {
+            JOptionPane.showMessageDialog(panel, "Marka ma zbyt mało znaków");
+            return false;
+        }
+        if (textFieldAutoModel.getText().length() < 2) {
+            JOptionPane.showMessageDialog(panel, "Model ma zbyt mało znaków");
+            return false;
+        }
+
+        try {
+            int rok = Integer.parseInt(textFieldAutoRokProdukcji.getText());
+            if (rok < 1900 || rok > Calendar.getInstance().get(Calendar.YEAR)) {
+                throw new Exception();
+            }
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(panel, "Podano nieprawy rok produkcji");
+            return false;
+        }
+        return true;
+    }
+
     private Auto edytujDaneAutaNaPodstawieInputu(Auto auto) {
+        if (!sprawdzInputUzytkownika()) {
+            return null;
+        }
         auto.setCenaZaDzien(Integer.parseInt(textFieldAutoCenaZaDzien.getText()));
         auto.setMarka(textFieldAutoMarka.getText());
         auto.setModel(textFieldAutoModel.getText());
@@ -145,6 +181,9 @@ public class Main extends JFrame {
 
     private void dodajAuto() {
         Auto auto = edytujDaneAutaNaPodstawieInputu(new Auto());
+        if (auto == null) {
+            return;
+        }
         repos.getAutoRepository().save(auto);
         zaladujDaneDlaAut();
         uzupelnijInputDlaAut();
@@ -157,7 +196,10 @@ public class Main extends JFrame {
             return;
         }
         Auto auto = a.get();
-        edytujDaneAutaNaPodstawieInputu(auto);
+        auto = edytujDaneAutaNaPodstawieInputu(auto);
+        if (auto == null) {
+            return;
+        }
         repos.getAutoRepository().save(auto);
         zaladujDaneDlaAut();
         uzupelnijInputDlaAut();

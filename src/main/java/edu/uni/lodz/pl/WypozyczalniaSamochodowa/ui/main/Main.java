@@ -26,11 +26,11 @@ public class Main extends JFrame {
     //<editor-fold desc="UI">
     private JPanel panel;
     private JTabbedPane tabbedPane1;
-    private JTable table1;
+    private JTable tablePracownicy;
     private JScrollPane scrollPane;
-    private JButton button1;
-    private JButton button2;
-    private JButton button3;
+    private JButton buttonPracownicyUsun;
+    private JButton buttonPracownicyDodaj;
+    private JButton buttonPracownicyEdytuj;
     private JTable tableAuta;
     private JButton buttonAutaDodaj;
     private JButton buttonAutaEdytuj;
@@ -42,6 +42,13 @@ public class Main extends JFrame {
     private JComboBox comboBoxAutoNadwozie;
     private JComboBox comboBoxAutoPaliwo;
     private JComboBox comboBoxAutoSkrzynia;
+    private JTextField textFieldImie;
+    private JTextField textFieldNazwisko;
+    private JTextField textFieldPesel;
+    private JTextField textFieldPlec;
+    private JTextField textFieldGodziny;
+    private JTextField textFieldLogin;
+    private JTextField textFieldHaslo;
     private DefaultTableColumnModel model;
     private JLabel jlabel;
     //</editor-fold>
@@ -94,7 +101,7 @@ public class Main extends JFrame {
                 .map(p -> new Object[]{p.getImie(), p.getNazwisko()})
                 .toArray(Object[][]::new);
         DefaultTableModel defaultTableModel = new DefaultTableModel(data, columnNames);
-        table1.setModel(defaultTableModel);
+        tablePracownicy.setModel(defaultTableModel);
     }
     //</editor-fold>
 

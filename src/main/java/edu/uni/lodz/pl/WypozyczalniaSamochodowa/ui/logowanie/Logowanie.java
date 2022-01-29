@@ -5,6 +5,7 @@ import edu.uni.lodz.pl.WypozyczalniaSamochodowa.model.klient.Klient;
 import edu.uni.lodz.pl.WypozyczalniaSamochodowa.model.pracownik.Pracownik;
 import edu.uni.lodz.pl.WypozyczalniaSamochodowa.ui.klient.KlientForm;
 import edu.uni.lodz.pl.WypozyczalniaSamochodowa.ui.main.Main;
+import edu.uni.lodz.pl.WypozyczalniaSamochodowa.ui.rejestracja.Rejestracja;
 import org.springframework.stereotype.Component;
 
 import javax.swing.*;
@@ -19,6 +20,7 @@ public class Logowanie extends JFrame {
     private JButton buttonAnuluj;
     private JTextField textFieldLogin;
     private JPasswordField passwordField;
+    private JButton buttonNoweKonto;
 
 
     public Logowanie(Repos repos) {
@@ -34,6 +36,7 @@ public class Logowanie extends JFrame {
 
         buttonZaloguj.addActionListener(e -> zaloguj());
         buttonAnuluj.addActionListener(e -> anuluj());
+        buttonNoweKonto.addActionListener(e-> utworzKonto(repos));
     }
 
     private void zaloguj() {
@@ -56,5 +59,10 @@ public class Logowanie extends JFrame {
 
     private void anuluj() {
         System.exit(0);
+    }
+    private void utworzKonto(Repos repos) {
+        Rejestracja rejestracja = new Rejestracja(repos);
+        rejestracja.setVisible(true);
+        //dispose();
     }
 }

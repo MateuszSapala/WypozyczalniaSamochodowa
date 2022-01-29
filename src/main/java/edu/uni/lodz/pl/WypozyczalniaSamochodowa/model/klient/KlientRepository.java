@@ -6,4 +6,6 @@ import java.util.Optional;
 
 public interface KlientRepository extends JpaRepository<Klient, Integer> {
     Optional<Klient> findByLoginAndHaslo(String login, String haslo);
+    Optional<Klient> findByLogin(String login);
+    Optional<Klient> findByPesel(String pesel);
 }

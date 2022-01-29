@@ -1,5 +1,6 @@
 package edu.uni.lodz.pl.WypozyczalniaSamochodowa.ui.main;
 
+import edu.uni.lodz.pl.WypozyczalniaSamochodowa.model.Plec;
 import edu.uni.lodz.pl.WypozyczalniaSamochodowa.model.Repos;
 import edu.uni.lodz.pl.WypozyczalniaSamochodowa.model.auto.Auto;
 import edu.uni.lodz.pl.WypozyczalniaSamochodowa.model.auto.Nadwozie;
@@ -20,8 +21,10 @@ import java.util.Optional;
 public class Main extends JFrame {
     private final Repos repos;
     private final AutoService autoService;
+    private final PracownikService pracownikService;
     private Pracownik zalogowanyPracownik;
     private Integer idWybranegoAuta;
+    private Integer idWybranegoPracownika;
 
     //<editor-fold desc="UI">
     private JPanel panel;
@@ -39,16 +42,16 @@ public class Main extends JFrame {
     private JTextField textFieldAutoMarka;
     private JTextField textFieldAutoModel;
     private JTextField textFieldAutoRokProdukcji;
-    private JComboBox comboBoxAutoNadwozie;
-    private JComboBox comboBoxAutoPaliwo;
-    private JComboBox comboBoxAutoSkrzynia;
-    private JTextField textFieldImie;
-    private JTextField textFieldNazwisko;
-    private JTextField textFieldPesel;
-    private JTextField textFieldPlec;
-    private JTextField textFieldGodziny;
-    private JTextField textFieldLogin;
-    private JTextField textFieldHaslo;
+    private JComboBox<Nadwozie> comboBoxAutoNadwozie;
+    private JComboBox<Paliwo> comboBoxAutoPaliwo;
+    private JComboBox<Skrzynia> comboBoxAutoSkrzynia;
+    private JTextField textFieldPracownikImie;
+    private JTextField textFieldPracownikNazwisko;
+    private JTextField textFieldPracownikPesel;
+    private JTextField textFieldPracownikGodziny;
+    private JTextField textFieldPracownikLogin;
+    private JTextField textFieldPracownikHaslo;
+    private JComboBox<Plec> comboBoxPracownikPlec;
     private DefaultTableColumnModel model;
     private JLabel jlabel;
     //</editor-fold>
@@ -56,11 +59,12 @@ public class Main extends JFrame {
     public Main(Repos repos, Pracownik zalogowanyPracownik) {
         this.repos = repos;
         this.zalogowanyPracownik = zalogowanyPracownik;
+        this.pracownikService = new PracownikService(repos);
         this.autoService = new AutoService(repos);
 
         setTitle("Wypożyczalnia samochodowa");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setPreferredSize(new Dimension(1500, 800));
+        setPreferredSize(new Dimension(1500, 600));
         setResizable(false);
         add(panel);
         zaladujDane();
@@ -69,12 +73,23 @@ public class Main extends JFrame {
         this.setVisible(true);
 
         //<editor-fold desc="ComboBoxes">
+        comboBoxPracownikPlec.setModel(new DefaultComboBoxModel<>(Plec.values()));
         comboBoxAutoNadwozie.setModel(new DefaultComboBoxModel<Nadwozie>(Nadwozie.values()));
         comboBoxAutoPaliwo.setModel(new DefaultComboBoxModel<Paliwo>(Paliwo.values()));
         comboBoxAutoSkrzynia.setModel(new DefaultComboBoxModel<Skrzynia>(Skrzynia.values()));
         //</editor-fold>
 
         //<editor-fold desc="Buttons">
+        buttonPracownicyDodaj.addActionListener(e -> dodajPracownika());
+        buttonPracownicyEdytuj.addActionListener(e -> edytujPracownika());
+        buttonPracownicyUsun.addActionListener(e -> usunPracownika());
+        tablePracownicy.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                zaladujDaneWybranegoPracownika();
+            }
+        });
+
         buttonAutaDodaj.addActionListener(e -> dodajAuto());
         buttonAutaEdytuj.addActionListener(e -> edytujAuto());
         buttonAutaUsun.addActionListener(e -> usunAuto());
@@ -101,8 +116,156 @@ public class Main extends JFrame {
                 .map(p -> new Object[]{p.getImie(), p.getNazwisko()})
                 .toArray(Object[][]::new);
         DefaultTableModel defaultTableModel = new DefaultTableModel(data, columnNames);
-        tablePracownicy.setModel(defaultTableModel);
+        tablePracownicy.setModel(pracownikService.tabelaPracownicy());
     }
+
+    private void zaladujDaneWybranegoPracownika() {
+        Pracownik p = pracownikService.pobierzWybranegoPracownikaZTabeli(tablePracownicy, panel);
+        if (p == null) {
+            return;
+        }
+        idWybranegoPracownika = p.getId();
+        uzupelnijInputDlaPracownika(p);
+    }
+
+    private void uzupelnijInputDlaPracownika() {
+        textFieldPracownikImie.setText("");
+        textFieldPracownikNazwisko.setText("");
+        textFieldPracownikPesel.setText("");
+        textFieldPracownikGodziny.setText("");
+        comboBoxPracownikPlec.setSelectedIndex(0);
+        textFieldPracownikLogin.setText("");
+        textFieldPracownikHaslo.setText("");
+        idWybranegoAuta = null;
+    }
+
+    private void uzupelnijInputDlaPracownika(Pracownik p) {
+        textFieldPracownikImie.setText(String.valueOf(p.getImie()));
+        textFieldPracownikNazwisko.setText(String.valueOf(p.getNazwisko()));
+        textFieldPracownikPesel.setText(String.valueOf(p.getPesel()));
+        textFieldPracownikGodziny.setText(String.valueOf(p.getGodzinyPracy()));
+        comboBoxPracownikPlec.setSelectedItem(p.getPlec());
+        textFieldPracownikLogin.setText(String.valueOf(p.getLogin()));
+        textFieldPracownikHaslo.setText(String.valueOf(p.getHaslo()));
+    }
+
+    private void dodajPracownika() {
+        Pracownik pracownik = edytujDanePracownikaNaPodstawieInputu(new Pracownik());
+        if (pracownik == null) {
+            return;
+        }
+        repos.getPracownikRepository().save(pracownik);
+        zaladujDanePracownikow();
+        uzupelnijInputDlaPracownika();
+    }
+
+    private boolean sprawdzInputPracownika() {
+        try {
+            String imie = textFieldPracownikImie.getText();
+            if (imie.length() < 2) {
+                throw new Exception();
+            }
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(panel, "Wprowadzone imie ma zbyt malo znakow!");
+            return false;
+        }
+
+        try {
+            String nazwisko = textFieldPracownikNazwisko.getText();
+            if (nazwisko.length() < 2) {
+                throw new Exception();
+            }
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(panel, "Wprowadzone nazwisko ma zbyt malo znakow!");
+            return false;
+        }
+
+        try {
+            String pesel = textFieldPracownikPesel.getText();
+            Float floatPesel = Float.parseFloat(pesel);
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(panel, "Pesel musi skladac sie z samych cyfr!");
+            return false;
+        }
+
+        try {
+            String pesel = textFieldPracownikPesel.getText();
+            if (pesel.length() != 11){
+                throw new Exception();
+            }
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(panel, "Pesel musi byc ciagiem 11 cyfr!");
+            return false;
+        }
+        try {
+            String haslo = textFieldPracownikHaslo.getText();
+            boolean isUpperCase = false;
+            boolean isLowerCase = false;
+            boolean isLength = false;
+            boolean isSpecialChar = false;
+            String specialCharactersString = "!@#$%&*()'+,-./:;<=>?[]^_`{|}";
+            for (int i = 0; i < haslo.length(); i++){
+                if (Character.isUpperCase(haslo.charAt(i))){
+                    isUpperCase = true;
+                }
+                if (Character.isLowerCase(haslo.charAt(i))){
+                    isLowerCase = true;
+                }
+                if (specialCharactersString.contains(Character.toString(haslo.charAt(i)))){
+                    isSpecialChar = true;
+                }
+            }
+            if (haslo.length() < 8){
+                isLength = true;
+            }
+            if (!isUpperCase || !isLowerCase || !isLength || !isSpecialChar) {
+                throw new Exception();
+            }
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(panel, "Haslo powinno skladac sie z 8 znakow, w tym po jednej malej i" +
+                    " duzej literze oraz znaku specjalnego!");
+            return false;
+        }
+        return true;
+    }
+
+    private Pracownik edytujDanePracownikaNaPodstawieInputu(Pracownik pracownik) {
+        if (!sprawdzInputPracownika()){
+            return null;
+        }
+        pracownik.setImie(textFieldPracownikImie.getText());
+        pracownik.setNazwisko(textFieldPracownikNazwisko.getText());
+        pracownik.setPesel(textFieldPracownikPesel.getText());
+//      pracownik.setGodzinyPracy(textFieldPracownikGodziny.getText());
+        pracownik.setPlec((Plec) comboBoxPracownikPlec.getSelectedItem());
+        pracownik.setLogin(textFieldPracownikLogin.getText());
+        pracownik.setHaslo(textFieldPracownikHaslo.getText());
+        return pracownik;
+    }
+
+    private void edytujPracownika() {
+        Optional<Pracownik> p = repos.getPracownikRepository().findById(idWybranegoPracownika);
+        if (p.isEmpty()) {
+            JOptionPane.showMessageDialog(panel, "Pracownika nie ma w bazie");
+            return;
+        }
+        Pracownik pracownik = p.get();
+        pracownik = edytujDanePracownikaNaPodstawieInputu(pracownik);
+        if (pracownik == null) {
+            return;
+        }
+        repos.getPracownikRepository().save(pracownik);
+        zaladujDanePracownikow();
+        uzupelnijInputDlaPracownika();
+    }
+
+    private void usunPracownika() {
+        repos.getPracownikRepository().deleteById(idWybranegoPracownika);
+        zaladujDanePracownikow();
+        uzupelnijInputDlaPracownika();
+    }
+
+
     //</editor-fold>
 
     //<editor-fold desc="Auta">

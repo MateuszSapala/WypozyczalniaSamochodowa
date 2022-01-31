@@ -42,6 +42,7 @@ public class Start implements CommandLineRunner {
         dodajKlientow();
         dodajAuta();
     }
+    ///sfa
 
     private void dodajPracownikow() {
         Time start = new Time(8, 0, 0);

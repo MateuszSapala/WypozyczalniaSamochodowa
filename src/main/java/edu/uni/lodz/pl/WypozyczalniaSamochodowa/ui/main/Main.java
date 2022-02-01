@@ -6,6 +6,7 @@ import edu.uni.lodz.pl.WypozyczalniaSamochodowa.model.auto.Auto;
 import edu.uni.lodz.pl.WypozyczalniaSamochodowa.model.auto.Nadwozie;
 import edu.uni.lodz.pl.WypozyczalniaSamochodowa.model.auto.Paliwo;
 import edu.uni.lodz.pl.WypozyczalniaSamochodowa.model.auto.Skrzynia;
+import edu.uni.lodz.pl.WypozyczalniaSamochodowa.model.klient.Klient;
 import edu.uni.lodz.pl.WypozyczalniaSamochodowa.model.pracownik.Pracownik;
 
 import javax.swing.*;
@@ -16,12 +17,16 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Calendar;
 import java.util.Optional;
+import java.util.List;
+
+import static javax.swing.JOptionPane.showMessageDialog;
 
 
 public class Main extends JFrame {
     private final Repos repos;
     private final AutoService autoService;
     private final PracownikService pracownikService;
+    private final KlientService klientService;
     private Pracownik zalogowanyPracownik;
     private Integer idWybranegoAuta;
     private Integer idWybranegoPracownika;
@@ -52,6 +57,9 @@ public class Main extends JFrame {
     private JTextField textFieldPracownikLogin;
     private JTextField textFieldPracownikHaslo;
     private JComboBox<Plec> comboBoxPracownikPlec;
+    private JTable tableKlienci;
+    private JTextField textFieldSzukajKlienta;
+    private JButton buttonSzukajKlienta;
     private DefaultTableColumnModel model;
     private JLabel jlabel;
     //</editor-fold>
@@ -61,6 +69,7 @@ public class Main extends JFrame {
         this.zalogowanyPracownik = zalogowanyPracownik;
         this.pracownikService = new PracownikService(repos);
         this.autoService = new AutoService(repos);
+        this.klientService = new KlientService(repos);
 
         setTitle("Wypożyczalnia samochodowa");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -100,11 +109,14 @@ public class Main extends JFrame {
             }
         });
         //</editor-fold>
+
+        buttonSzukajKlienta.addActionListener(e -> zaladujDaneSzukanegoKlienta());
     }
 
     private void zaladujDane() {
         zaladujDanePracownikow();
         zaladujDaneDlaAut();
+        zaladujDaneKlientow();
     }
 
     //<editor-fold desc="Pracownicy">
@@ -381,4 +393,23 @@ public class Main extends JFrame {
         uzupelnijInputDlaAut();
     }
     //</editor-fold>
+
+    private void zaladujDaneKlientow(){ tableKlienci.setModel(klientService.tabelaKlienci()); }
+
+    private void zaladujDaneSzukanegoKlienta(){
+        String szukane = textFieldSzukajKlienta.getText();
+        if(szukane.isEmpty()){
+            zaladujDaneKlientow();
+        }
+        else{
+            List<Klient> klientOptional = repos.getKlientRepository().findByImieLikeOrNazwiskoLikeOrLoginLike(szukane);
+            if (!(klientOptional.isEmpty())) {
+                tableKlienci.setModel(klientService.tabelaSzukanychKlientów(szukane));
+            }
+            else {
+                showMessageDialog(null, "Brak takiego klienta!");
+            }
+        }
+    }
+
 }

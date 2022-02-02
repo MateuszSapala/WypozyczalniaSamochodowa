@@ -11,7 +11,6 @@ import edu.uni.lodz.pl.WypozyczalniaSamochodowa.model.pracownik.Pracownik;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableColumnModel;
-import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -27,7 +26,7 @@ public class Main extends JFrame {
     private final AutoService autoService;
     private final PracownikService pracownikService;
     private final KlientService klientService;
-    private Pracownik zalogowanyPracownik;
+    private final Pracownik zalogowanyPracownik;
     private Integer idWybranegoAuta;
     private Integer idWybranegoPracownika;
 
@@ -43,10 +42,10 @@ public class Main extends JFrame {
     private JButton buttonAutaDodaj;
     private JButton buttonAutaEdytuj;
     private JButton buttonAutaUsun;
-    private JTextField textFieldAutoCenaZaDzien;
+    private JSpinner spinnerAutoCenaZaGodzine;
     private JTextField textFieldAutoMarka;
     private JTextField textFieldAutoModel;
-    private JTextField textFieldAutoRokProdukcji;
+    private JSpinner spinnerAutoRokProdukcji;
     private JComboBox<Nadwozie> comboBoxAutoNadwozie;
     private JComboBox<Paliwo> comboBoxAutoPaliwo;
     private JComboBox<Skrzynia> comboBoxAutoSkrzynia;
@@ -108,9 +107,18 @@ public class Main extends JFrame {
                 zaladujDaneWybranegoAuta();
             }
         });
+        buttonSzukajKlienta.addActionListener(e -> zaladujDaneSzukanegoKlienta());
         //</editor-fold>
 
-        buttonSzukajKlienta.addActionListener(e -> zaladujDaneSzukanegoKlienta());
+        //<editor-fold desc="Spinners">
+        spinnerAutoCenaZaGodzine.setModel(new SpinnerNumberModel(1, 1, 1000, 1));
+        spinnerAutoRokProdukcji.setModel(new SpinnerNumberModel(Calendar.getInstance().get(Calendar.YEAR)-5, 1900, Calendar.getInstance().get(Calendar.YEAR), 1));
+
+        JSpinner.DefaultEditor spinnerEditorAutoCenaZaGodzine = (JSpinner.DefaultEditor)(spinnerAutoCenaZaGodzine.getEditor());
+        spinnerEditorAutoCenaZaGodzine.getTextField().setHorizontalAlignment(JTextField.LEFT);
+        JSpinner.DefaultEditor spinnerEditorAutoRokProdukcji = (JSpinner.DefaultEditor)(spinnerAutoRokProdukcji.getEditor());
+        spinnerEditorAutoRokProdukcji.getTextField().setHorizontalAlignment(JTextField.LEFT);
+        //</editor-fold>
     }
 
     private void zaladujDane() {
@@ -127,7 +135,6 @@ public class Main extends JFrame {
                 .stream()
                 .map(p -> new Object[]{p.getImie(), p.getNazwisko()})
                 .toArray(Object[][]::new);
-        DefaultTableModel defaultTableModel = new DefaultTableModel(data, columnNames);
         tablePracownicy.setModel(pracownikService.tabelaPracownicy());
     }
 
@@ -166,7 +173,11 @@ public class Main extends JFrame {
         if (pracownik == null) {
             return;
         }
-        repos.getPracownikRepository().save(pracownik);
+        try {
+            repos.getPracownikRepository().save(pracownik);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(panel, e.getMessage());
+        }
         zaladujDanePracownikow();
         uzupelnijInputDlaPracownika();
     }
@@ -227,7 +238,7 @@ public class Main extends JFrame {
                     isSpecialChar = true;
                 }
             }
-            if (haslo.length() < 8){
+            if (haslo.length() >= 8){
                 isLength = true;
             }
             if (!isUpperCase || !isLowerCase || !isLength || !isSpecialChar) {
@@ -266,7 +277,11 @@ public class Main extends JFrame {
         if (pracownik == null) {
             return;
         }
-        repos.getPracownikRepository().save(pracownik);
+        try {
+            repos.getPracownikRepository().save(pracownik);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(panel, e.getMessage());
+        }
         zaladujDanePracownikow();
         uzupelnijInputDlaPracownika();
     }
@@ -295,10 +310,10 @@ public class Main extends JFrame {
     }
 
     private void uzupelnijInputDlaAut() {
-        textFieldAutoCenaZaDzien.setText("");
+        spinnerAutoCenaZaGodzine.setValue(1);
         textFieldAutoMarka.setText("");
         textFieldAutoModel.setText("");
-        textFieldAutoRokProdukcji.setText("");
+        spinnerAutoRokProdukcji.setValue(Calendar.getInstance().get(Calendar.YEAR)-5);
         comboBoxAutoNadwozie.setSelectedIndex(0);
         comboBoxAutoPaliwo.setSelectedIndex(0);
         comboBoxAutoSkrzynia.setSelectedIndex(0);
@@ -306,42 +321,22 @@ public class Main extends JFrame {
     }
 
     private void uzupelnijInputDlaAut(Auto auto) {
-        textFieldAutoCenaZaDzien.setText(String.valueOf(auto.getCenaZaDzien()));
+        spinnerAutoCenaZaGodzine.setValue(auto.getCenaZaGodzine());
         textFieldAutoMarka.setText(auto.getMarka());
         textFieldAutoModel.setText(auto.getModel());
-        textFieldAutoRokProdukcji.setText(String.valueOf(auto.getRokProdukcji()));
+        spinnerAutoRokProdukcji.setValue(auto.getRokProdukcji());
         comboBoxAutoNadwozie.setSelectedItem(auto.getNadwozie());
         comboBoxAutoPaliwo.setSelectedItem(auto.getPaliwo());
         comboBoxAutoSkrzynia.setSelectedItem(auto.getSkrzynia());
     }
 
     private boolean sprawdzInputUzytkownika() {
-        try {
-            int cena = Integer.parseInt(textFieldAutoCenaZaDzien.getText());
-            if (cena < 0) {
-                throw new Exception();
-            }
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(panel, "Podano nieprawidłową cenę za dzień");
-            return false;
-        }
-
         if (textFieldAutoMarka.getText().length() < 3) {
             JOptionPane.showMessageDialog(panel, "Marka ma zbyt mało znaków");
             return false;
         }
         if (textFieldAutoModel.getText().length() < 2) {
             JOptionPane.showMessageDialog(panel, "Model ma zbyt mało znaków");
-            return false;
-        }
-
-        try {
-            int rok = Integer.parseInt(textFieldAutoRokProdukcji.getText());
-            if (rok < 1900 || rok > Calendar.getInstance().get(Calendar.YEAR)) {
-                throw new Exception();
-            }
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(panel, "Podano nieprawy rok produkcji");
             return false;
         }
         return true;
@@ -351,10 +346,10 @@ public class Main extends JFrame {
         if (!sprawdzInputUzytkownika()) {
             return null;
         }
-        auto.setCenaZaDzien(Integer.parseInt(textFieldAutoCenaZaDzien.getText()));
+        auto.setCenaZaGodzine((int) spinnerAutoCenaZaGodzine.getValue());
         auto.setMarka(textFieldAutoMarka.getText());
         auto.setModel(textFieldAutoModel.getText());
-        auto.setRokProdukcji(Integer.parseInt(textFieldAutoRokProdukcji.getText()));
+        auto.setRokProdukcji((int) spinnerAutoRokProdukcji.getValue());
         auto.setNadwozie((Nadwozie) comboBoxAutoNadwozie.getSelectedItem());
         auto.setPaliwo((Paliwo) comboBoxAutoPaliwo.getSelectedItem());
         auto.setSkrzynia((Skrzynia) comboBoxAutoSkrzynia.getSelectedItem());

@@ -23,15 +23,15 @@ public class Auto {
     private Paliwo paliwo;
     private Skrzynia skrzynia;
     private int rokProdukcji;
-    private int cenaZaDzien;
+    private int cenaZaGodzine;
 
-    public Auto(String marka, String model, Nadwozie nadwozie, Paliwo paliwo, Skrzynia skrzynia, int rokProdukcji, int cenaZaDzien) {
+    public Auto(String marka, String model, Nadwozie nadwozie, Paliwo paliwo, Skrzynia skrzynia, int rokProdukcji, int cenaZaGodzine) {
         this.marka = marka;
         this.model = model;
         this.nadwozie = nadwozie;
         this.paliwo = paliwo;
         this.skrzynia = skrzynia;
         this.rokProdukcji = rokProdukcji;
-        this.cenaZaDzien = cenaZaDzien;
+        this.cenaZaGodzine = cenaZaGodzine;
     }
 }

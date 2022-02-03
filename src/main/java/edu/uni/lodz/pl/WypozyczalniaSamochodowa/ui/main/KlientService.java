@@ -31,6 +31,8 @@ public class KlientService {
         return new DefaultTableModel(data, columnNames);
     }
 
+    //public Klient wyswietlDane
+
 }
 
 

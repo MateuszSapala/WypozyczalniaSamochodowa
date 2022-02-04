@@ -15,7 +15,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 
-import java.sql.Time;
+import java.time.LocalTime;
 import java.util.List;
 
 @SpringBootApplication
@@ -44,8 +44,8 @@ public class Start implements CommandLineRunner {
     }
 
     private void dodajPracownikow() {
-        Time start = new Time(8, 0, 0);
-        Time end = new Time(16, 0, 0);
+        LocalTime start = LocalTime.of(8,0,0);
+        LocalTime end =  LocalTime.of(16, 0, 0);
         GodzinyPracy g1 = new GodzinyPracy(start, end, start, end, start, end, start, end, start, end, start, end);
         GodzinyPracy g2 = new GodzinyPracy(start, end, start, end, start, end, start, end, start, end, start, end);
         GodzinyPracy g3 = new GodzinyPracy(start, end, start, end, start, end, start, end, start, end, start, end);

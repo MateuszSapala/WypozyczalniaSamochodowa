@@ -22,6 +22,14 @@ public class AutoService {
         return new DefaultTableModel(data, columnNames);
     }
 
+    public DefaultComboBoxModel comboBoxAuta(){
+        Auto[] autaArray = repos.getAutoRepository()
+                .findAll()
+                .stream()
+                .toArray(Auto[]::new);
+        return new DefaultComboBoxModel(autaArray);
+    }
+
     public Auto pobierzWybraneAutoZTabeli(JTable tableAuta, JPanel panel) {
         if (tableAuta.getSelectedRow() < 0) {
             JOptionPane.showMessageDialog(panel, "Nie wybrano wiersza");
@@ -30,7 +38,7 @@ public class AutoService {
         Integer id = (int) tableAuta.getValueAt(tableAuta.getSelectedRow(), 0);
         Optional<Auto> auto = repos.getAutoRepository().findById(id);
         if (auto.isEmpty()) {
-            JOptionPane.showMessageDialog(panel, "Auta nie ma w bazie");
+            JOptionPane.showMessageDialog(panel, "Brak wypozyczenia nie ma w bazie");
             return null;
         }
         return auto.get();

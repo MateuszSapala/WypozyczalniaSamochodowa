@@ -27,8 +27,10 @@ public class Main extends JFrame {
     private final PracownikService pracownikService;
     private final KlientService klientService;
     private final Pracownik zalogowanyPracownik;
+    private final WypozyczenieService wypozyczenieService;
     private Integer idWybranegoAuta;
     private Integer idWybranegoPracownika;
+
 
     //<editor-fold desc="UI">
     private JPanel panel;
@@ -59,6 +61,7 @@ public class Main extends JFrame {
     private JTable tableKlienci;
     private JTextField textFieldSzukajKlienta;
     private JButton buttonSzukajKlienta;
+    private JTable tableRezerwacje;
     private DefaultTableColumnModel model;
     private JLabel jlabel;
     //</editor-fold>
@@ -69,6 +72,7 @@ public class Main extends JFrame {
         this.pracownikService = new PracownikService(repos);
         this.autoService = new AutoService(repos);
         this.klientService = new KlientService(repos);
+        this.wypozyczenieService = new WypozyczenieService(repos);
 
         setTitle("Wypożyczalnia samochodowa");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -125,6 +129,7 @@ public class Main extends JFrame {
         zaladujDanePracownikow();
         zaladujDaneDlaAut();
         zaladujDaneKlientow();
+        zaladujRezerwacje();
     }
 
     //<editor-fold desc="Pracownicy">
@@ -406,5 +411,6 @@ public class Main extends JFrame {
             }
         }
     }
+    private void zaladujRezerwacje(){ tableRezerwacje.setModel(wypozyczenieService.allWypozyczeniaTabela());}
 
 }

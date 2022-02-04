@@ -34,4 +34,11 @@ public class Auto {
         this.rokProdukcji = rokProdukcji;
         this.cenaZaGodzine = cenaZaGodzine;
     }
+
+    @Override
+    public String toString() {
+        return  marka + " " +
+                model + ", cena za godzinę: " +
+                cenaZaGodzine;
+    }
 }

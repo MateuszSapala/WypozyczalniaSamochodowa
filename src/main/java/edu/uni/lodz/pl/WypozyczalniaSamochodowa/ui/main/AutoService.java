@@ -38,7 +38,7 @@ public class AutoService {
         Integer id = (int) tableAuta.getValueAt(tableAuta.getSelectedRow(), 0);
         Optional<Auto> auto = repos.getAutoRepository().findById(id);
         if (auto.isEmpty()) {
-            JOptionPane.showMessageDialog(panel, "Brak wypozyczenia nie ma w bazie");
+            JOptionPane.showMessageDialog(panel, "Auta o podanym id nie ma w bazie");
             return null;
         }
         return auto.get();

@@ -172,15 +172,14 @@ public class KlientForm extends JFrame {
         List<Wypozyczenie> wypozyczenia =  repos.getWypozyczenieRepository().findByAutoId(((Auto)comboBoxSamochod.getSelectedItem()).getId());
 
         Optional<Wypozyczenie> wypozyczenieZajete = wypozyczenia.stream()
-                 .filter(wypozyczenie -> (dataPozniejszaLubTakaSama(wypozyczenie.getDataPoczatkowa(),dataOd) && dataWczesniejszaLubTakaSama(wypozyczenie.getDataPoczatkowa(),dataDo))
-                         || (dataWczesniejszaLubTakaSama(wypozyczenie.getDataPoczatkowa(),dataOd) && dataPozniejszaLubTakaSama(wypozyczenie.getDataKoncowa(),dataOd)))
+                 .filter(wypozyczenie -> dataWczesniejszaLubTakaSama(dataOd,wypozyczenie.getDataKoncowa()) && dataWczesniejszaLubTakaSama(wypozyczenie.getDataPoczatkowa(),dataDo))
                  .findFirst();
          return wypozyczenieZajete.isPresent();
      }
 
      private Wypozyczenie stworzWypozyczenie( LocalDateTime dataOd, LocalDateTime dataDo, Auto auto)
      {
-         return new Wypozyczenie(dataOd,dataDo,zalogowanyKlient,auto,Integer.parseInt(labelCenaValue.getText()));
+         return new Wypozyczenie(dataOd,dataDo,zalogowanyKlient,auto,Integer.parseInt(labelCenaValue.getText().substring(0,labelCenaValue.getText().length() - 3)));
      }
 
 
@@ -208,8 +207,10 @@ public class KlientForm extends JFrame {
 
     private void anuluj() {
         Wypozyczenie wypozyczenie = pobierzWypozyczenieZTabeli(tableWypozyczenie);
-        wypozyczenie.setAuto(null);
-        wypozyczenie.setKlient(null);
+        if(Objects.nonNull(wypozyczenie)) {
+            wypozyczenie.setAuto(null);
+            wypozyczenie.setKlient(null);
+        }
         repos.getWypozyczenieRepository().deleteById(wypozyczenie.getId());
         zaladujWypozyczeniaKlienta();
     }

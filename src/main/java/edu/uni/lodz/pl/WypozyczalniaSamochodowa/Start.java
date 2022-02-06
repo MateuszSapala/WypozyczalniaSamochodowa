@@ -14,6 +14,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalTime;
 import java.util.List;
@@ -31,7 +33,7 @@ public class Start implements CommandLineRunner {
     public void run(String... args) {
         Logowanie logowanie = new Logowanie(repos);
         logowanie.setVisible(true);
-        dodajDane();
+       //dodajDane();
     }
 
     private void dodajDane() {

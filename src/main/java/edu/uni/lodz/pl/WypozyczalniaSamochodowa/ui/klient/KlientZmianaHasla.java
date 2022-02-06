@@ -5,6 +5,7 @@ import edu.uni.lodz.pl.WypozyczalniaSamochodowa.model.klient.Klient;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Arrays;
 import java.util.Optional;
 
 import static javax.swing.JOptionPane.showMessageDialog;
@@ -35,18 +36,18 @@ public class KlientZmianaHasla extends JFrame {
         buttonAnuluj.addActionListener(e -> anuluj());
     }
     private void zmienHaslo(){
-        if (passwordField1.getText().isEmpty() || passwordField2.getText().isEmpty()) {
+        if (Arrays.toString(passwordField1.getPassword()).isEmpty() || Arrays.toString(passwordField2.getPassword()).isEmpty()) {
             showMessageDialog(null, "Oba pola muszą być wypełnione!");
         }
-        else if(!(passwordField1.getText().equals(passwordField2.getText()))){
+        else if(!(Arrays.toString(passwordField1.getPassword()).equals(Arrays.toString(passwordField2.getPassword())))){
             showMessageDialog(null, "Hasło i powtórzone hasło muszą być takie same!");
         }
-        else if(hasloValidator(passwordField1.getText())==false){
+        else if(!hasloValidator(Arrays.toString(passwordField1.getPassword()))){
             showMessageDialog(null,"Hasło musi zawierać od 8 do 20 znaków, minimum jedną małą literę, dużą literę, cyfrę i symbol!" );
         }
         else {
             showMessageDialog(null, "Hasło zmienione!");
-            zalogowanyKlient.setHaslo(passwordField1.getText());
+            zalogowanyKlient.setHaslo(Arrays.toString(passwordField1.getPassword()));
             repos.getKlientRepository().save(zalogowanyKlient);
             klientForm.zaladujDanePonownie();
             dispose();
@@ -55,7 +56,6 @@ public class KlientZmianaHasla extends JFrame {
     private void anuluj() { dispose(); }
 
     private boolean hasloValidator(String haslo){
-        if(!(haslo.matches( "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#&()–[{}]:;',?/*~$^+=<>]).{8,20}$"))) return false;
-        else return true;
+        return haslo.matches("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#&()–[{}]:;',?/*~$^+=<>]).{8,20}$");
     }
 }

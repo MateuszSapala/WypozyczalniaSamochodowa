@@ -1,5 +1,7 @@
 package edu.uni.lodz.pl.WypozyczalniaSamochodowa.ui.main;
 
+import com.github.lgooddatepicker.components.TimePicker;
+import com.github.lgooddatepicker.components.TimePickerSettings;
 import edu.uni.lodz.pl.WypozyczalniaSamochodowa.model.Plec;
 import edu.uni.lodz.pl.WypozyczalniaSamochodowa.model.Repos;
 import edu.uni.lodz.pl.WypozyczalniaSamochodowa.model.auto.Auto;
@@ -67,18 +69,6 @@ public class Main extends JFrame {
     private JTable tableKlienci;
     private JTextField textFieldSzukajKlienta;
     private JButton buttonSzukajKlienta;
-    private JTextField textFieldPonidzialekDoGodzinyPracy;
-    private JTextField textFieldPonidzialekOdGodzinyPracy;
-    private JTextField textFieldSrodaOdGodzinyPracy;
-    private JTextField textFieldWtorekOdGodzinyPracy;
-    private JTextField textFieldCzwartekOdGodzinyPracy;
-    private JTextField textFieldPiatekOdGodzinyPracy;
-    private JTextField textFieldSobotaOdGodzinyPracy;
-    private JTextField textFieldWtorekDoGodzinyPracy;
-    private JTextField textFieldSrodaDoGodzinyPracy;
-    private JTextField textFieldCzwartekDoGodzinyPracy;
-    private JTextField textFieldPiatekDoGodzinyPracy;
-    private JTextField textFieldSobotaDoGodzinyPracy;
     private JButton button10_18;
     private JButton button9_17;
     private JButton button8_16;
@@ -89,6 +79,18 @@ public class Main extends JFrame {
     private JTextField textFieldSzukajGodziny;
     private JComboBox comboBoxGodzinyPracyPracownicy;
     private JTable tableRezerwacje;
+    private TimePicker timePickerPoniedzialekOdGodzinyPracy;
+    private TimePicker timePickerPoniedzialekDoGodzinyPracy;
+    private TimePicker timePickerWtorekOdGodzinyPracy;
+    private TimePicker timePickerWtorekDoGodzinyPracy;
+    private TimePicker timePickerSrodaOdGodzinyPracy;
+    private TimePicker timePickerSrodaDoGodzinyPracy;
+    private TimePicker timePickerCzwartekOdGodzinyPracy;
+    private TimePicker timePickerCzwartekDoGodzinyPracy;
+    private TimePicker timePickerPiatekOdGodzinyPracy;
+    private TimePicker timePickerPiatekDoGodzinyPracy;
+    private TimePicker timePickerSobotaOdGodzinyPracy;
+    private TimePicker timePickerSobotaDoGodzinyPracy;
     private DefaultTableColumnModel model;
     private JLabel jlabel;
     private java.sql.Time Time;
@@ -153,14 +155,26 @@ public class Main extends JFrame {
         spinnerEditorAutoRokProdukcji.getTextField().setHorizontalAlignment(JTextField.LEFT);
         //</editor-fold>
 
+        timePickerPoniedzialekOdGodzinyPracy.getSettings().generatePotentialMenuTimes(TimePickerSettings.TimeIncrement.OneHour, LocalTime.of(6,0,0),LocalTime.of(20,0,0));;
+        timePickerPoniedzialekDoGodzinyPracy.getSettings().generatePotentialMenuTimes(TimePickerSettings.TimeIncrement.OneHour, LocalTime.of(6,0,0),LocalTime.of(20,0,0));;
+        timePickerWtorekOdGodzinyPracy.getSettings().generatePotentialMenuTimes(TimePickerSettings.TimeIncrement.OneHour, LocalTime.of(6,0,0),LocalTime.of(20,0,0));;
+        timePickerWtorekDoGodzinyPracy.getSettings().generatePotentialMenuTimes(TimePickerSettings.TimeIncrement.OneHour, LocalTime.of(6,0,0),LocalTime.of(20,0,0));;
+        timePickerSrodaOdGodzinyPracy.getSettings().generatePotentialMenuTimes(TimePickerSettings.TimeIncrement.OneHour, LocalTime.of(6,0,0),LocalTime.of(20,0,0));;
+        timePickerSrodaDoGodzinyPracy.getSettings().generatePotentialMenuTimes(TimePickerSettings.TimeIncrement.OneHour, LocalTime.of(6,0,0),LocalTime.of(20,0,0));;
+        timePickerCzwartekOdGodzinyPracy.getSettings().generatePotentialMenuTimes(TimePickerSettings.TimeIncrement.OneHour, LocalTime.of(6,0,0),LocalTime.of(20,0,0));;
+        timePickerCzwartekDoGodzinyPracy.getSettings().generatePotentialMenuTimes(TimePickerSettings.TimeIncrement.OneHour, LocalTime.of(6,0,0),LocalTime.of(20,0,0));;
+        timePickerPiatekOdGodzinyPracy.getSettings().generatePotentialMenuTimes(TimePickerSettings.TimeIncrement.OneHour, LocalTime.of(6,0,0),LocalTime.of(20,0,0));;
+        timePickerPiatekDoGodzinyPracy.getSettings().generatePotentialMenuTimes(TimePickerSettings.TimeIncrement.OneHour, LocalTime.of(6,0,0),LocalTime.of(20,0,0));;
+        timePickerSobotaOdGodzinyPracy.getSettings().generatePotentialMenuTimes(TimePickerSettings.TimeIncrement.OneHour, LocalTime.of(6,0,0),LocalTime.of(20,0,0));;
+        timePickerSobotaDoGodzinyPracy.getSettings().generatePotentialMenuTimes(TimePickerSettings.TimeIncrement.OneHour, LocalTime.of(6,0,0),LocalTime.of(20,0,0));;
 
         buttonDodajGodzinyPracy.addActionListener(e -> dodajGodzinyPracy());
         buttonEdytujGodzinyPracy.addActionListener(e -> edytujGodzinyPracy());
         buttonUsuńGodzinyPracy.addActionListener(e -> usunGodzinyPracy());
-        button7_15.addActionListener(e -> ustawGodzinyPracy7_15());
-        button8_16.addActionListener(e -> ustawGodzinyPracy8_16());
-        button9_17.addActionListener(e -> ustawGodzinyPracy9_17());
-        button10_18.addActionListener(e -> ustawGodzinyPracy10_18());
+        button7_15.addActionListener(e -> czasPracy(7));
+        button8_16.addActionListener(e -> czasPracy(8));
+        button9_17.addActionListener(e -> czasPracy(9));
+        button10_18.addActionListener(e -> czasPracy(10));
         comboBoxGodzinyPracyPracownicy.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -446,6 +460,7 @@ public class Main extends JFrame {
     }
     //</editor-fold>
 
+    //<editor-fold desc="Klienci">
     private void zaladujDaneKlientow(){ tableKlienci.setModel(klientService.tabelaKlienci()); }
 
     private void zaladujDaneSzukanegoKlienta(){
@@ -463,66 +478,92 @@ public class Main extends JFrame {
             }
         }
     }
+    //</editor-fold>
+
     private void zaladujRezerwacje(){ tableRezerwacje.setModel(wypozyczenieService.allWypozyczeniaTabela());}
 
+    //<editor-fold desc="Godziny pracy">
     private void zeorwanieGodzinPracy() {
-        textFieldPonidzialekOdGodzinyPracy.setText("");
-        textFieldPonidzialekDoGodzinyPracy.setText("");
-        textFieldWtorekOdGodzinyPracy.setText("");
-        textFieldWtorekDoGodzinyPracy.setText("");
-        textFieldSrodaOdGodzinyPracy.setText("");
-        textFieldSrodaDoGodzinyPracy.setText("");
-        textFieldCzwartekOdGodzinyPracy.setText("");
-        textFieldCzwartekDoGodzinyPracy.setText("");
-        textFieldPiatekOdGodzinyPracy.setText("");
-        textFieldPiatekDoGodzinyPracy.setText("");
-        textFieldSobotaOdGodzinyPracy.setText("");
-        textFieldSobotaDoGodzinyPracy.setText("");
+        timePickerPoniedzialekOdGodzinyPracy.setText("");
+        timePickerPoniedzialekDoGodzinyPracy.setText("");
+        timePickerWtorekOdGodzinyPracy.setText("");
+        timePickerWtorekDoGodzinyPracy.setText("");
+        timePickerSrodaOdGodzinyPracy.setText("");
+        timePickerSrodaDoGodzinyPracy.setText("");
+        timePickerCzwartekOdGodzinyPracy.setText("");
+        timePickerCzwartekDoGodzinyPracy.setText("");
+        timePickerPiatekOdGodzinyPracy.setText("");
+        timePickerPiatekDoGodzinyPracy.setText("");
+        timePickerSobotaOdGodzinyPracy.setText("");
+        timePickerSobotaDoGodzinyPracy.setText("");
     }
 
-    private void zaladujDaneGodzinPracy(){
+    private void zaladujDaneGodzinPracy() {
         Optional<GodzinyPracy> godzinyPracyOptional = repos.getGodzinyPracyRepository().findByPracownik((Pracownik) comboBoxGodzinyPracyPracownicy.getSelectedItem());
-        zeorwanieGodzinPracy();
-        godzinyPracyOptional.ifPresent(this::uzupelnijInputDlaGodzin);
+
+        godzinyPracyOptional.ifPresentOrElse((g) -> {
+            uzupelnijInputDlaGodzin(g);
+            buttonDodajGodzinyPracy.setEnabled(false);
+        }, () -> {
+            zeorwanieGodzinPracy();
+            buttonDodajGodzinyPracy.setEnabled(true);
+        });
     }
 
     private void uzupelnijInputDlaGodzin(GodzinyPracy godzinyPracy) {
-        textFieldPonidzialekOdGodzinyPracy.setText(String.valueOf(godzinyPracy.getPoniedzialekOd()));
-        textFieldPonidzialekDoGodzinyPracy.setText(String.valueOf(godzinyPracy.getPoniedzialekDo()));
-        textFieldWtorekOdGodzinyPracy.setText(String.valueOf(godzinyPracy.getWtorekOd()));
-        textFieldWtorekDoGodzinyPracy.setText(String.valueOf(godzinyPracy.getWtorekDo()));
-        textFieldSrodaOdGodzinyPracy.setText(String.valueOf(godzinyPracy.getSrodaOd()));
-        textFieldSrodaDoGodzinyPracy.setText(String.valueOf(godzinyPracy.getSrodaDo()));
-        textFieldCzwartekOdGodzinyPracy.setText(String.valueOf(godzinyPracy.getCzwartekOd()));
-        textFieldCzwartekDoGodzinyPracy.setText(String.valueOf(godzinyPracy.getCzwartekDo()));
-        textFieldPiatekOdGodzinyPracy.setText(String.valueOf(godzinyPracy.getPiatekOd()));
-        textFieldPiatekDoGodzinyPracy.setText(String.valueOf(godzinyPracy.getPiatekDo()));
-        textFieldSobotaOdGodzinyPracy.setText(String.valueOf(godzinyPracy.getSobotaOd()));
-        textFieldSobotaDoGodzinyPracy.setText(String.valueOf(godzinyPracy.getSobotaDo()));
+        timePickerPoniedzialekOdGodzinyPracy.setText(String.valueOf(godzinyPracy.getPoniedzialekOd()));
+        timePickerPoniedzialekDoGodzinyPracy.setText(String.valueOf(godzinyPracy.getPoniedzialekDo()));
+        timePickerWtorekOdGodzinyPracy.setText(String.valueOf(godzinyPracy.getWtorekOd()));
+        timePickerWtorekDoGodzinyPracy.setText(String.valueOf(godzinyPracy.getWtorekDo()));
+        timePickerSrodaOdGodzinyPracy.setText(String.valueOf(godzinyPracy.getSrodaOd()));
+        timePickerSrodaDoGodzinyPracy.setText(String.valueOf(godzinyPracy.getSrodaDo()));
+        timePickerCzwartekOdGodzinyPracy.setText(String.valueOf(godzinyPracy.getCzwartekOd()));
+        timePickerCzwartekDoGodzinyPracy.setText(String.valueOf(godzinyPracy.getCzwartekDo()));
+        timePickerPiatekOdGodzinyPracy.setText(String.valueOf(godzinyPracy.getPiatekOd()));
+        timePickerPiatekDoGodzinyPracy.setText(String.valueOf(godzinyPracy.getPiatekDo()));
+        timePickerSobotaOdGodzinyPracy.setText(String.valueOf(godzinyPracy.getSobotaOd()));
+        timePickerSobotaDoGodzinyPracy.setText(String.valueOf(godzinyPracy.getSobotaDo()));
     }
 
     private GodzinyPracy edytujGodzinyPracyNaPodstawieInputu(GodzinyPracy godzPracy) {
         godzPracy.setPracownik((Pracownik) comboBoxGodzinyPracyPracownicy.getSelectedItem());
-        godzPracy.setPoniedzialekOd(LocalTime.of(Integer.parseInt(textFieldPonidzialekOdGodzinyPracy.getText()),0) );
-        godzPracy.setPoniedzialekDo(LocalTime.of(Integer.parseInt(textFieldPonidzialekDoGodzinyPracy.getText()),0) );
-        godzPracy.setWtorekOd(LocalTime.of(Integer.parseInt(textFieldWtorekOdGodzinyPracy.getText()),0) );
-        godzPracy.setWtorekDo(LocalTime.of(Integer.parseInt(textFieldWtorekDoGodzinyPracy.getText()),0) );
-        godzPracy.setSrodaOd(LocalTime.of(Integer.parseInt(textFieldSrodaOdGodzinyPracy.getText()),0) );
-        godzPracy.setSrodaDo(LocalTime.of(Integer.parseInt(textFieldSrodaDoGodzinyPracy.getText()),0) );
-        godzPracy.setCzwartekOd(LocalTime.of(Integer.parseInt(textFieldCzwartekOdGodzinyPracy.getText()),0) );
-        godzPracy.setCzwartekDo(LocalTime.of(Integer.parseInt(textFieldCzwartekDoGodzinyPracy.getText()),0) );
-        godzPracy.setPiatekOd(LocalTime.of(Integer.parseInt(textFieldPiatekOdGodzinyPracy.getText()),0) );
-        godzPracy.setPiatekDo(LocalTime.of(Integer.parseInt(textFieldPiatekDoGodzinyPracy.getText()),0) );
-        godzPracy.setSobotaOd(LocalTime.of(Integer.parseInt(textFieldSobotaDoGodzinyPracy.getText()),0) );
-        godzPracy.setSobotaDo(LocalTime.of(Integer.parseInt(textFieldSobotaDoGodzinyPracy.getText()),0) );
+        godzPracy.setPoniedzialekOd(timePickerPoniedzialekOdGodzinyPracy.getTime());
+        godzPracy.setPoniedzialekDo(timePickerPoniedzialekDoGodzinyPracy.getTime());
+        godzPracy.setWtorekOd(timePickerWtorekOdGodzinyPracy.getTime());
+        godzPracy.setWtorekDo(timePickerWtorekDoGodzinyPracy.getTime());
+        godzPracy.setSrodaOd(timePickerSrodaOdGodzinyPracy.getTime());
+        godzPracy.setSrodaDo(timePickerSrodaDoGodzinyPracy.getTime());
+        godzPracy.setCzwartekOd(timePickerCzwartekOdGodzinyPracy.getTime());
+        godzPracy.setCzwartekDo(timePickerCzwartekDoGodzinyPracy.getTime());
+        godzPracy.setPiatekOd(timePickerPiatekOdGodzinyPracy.getTime());
+        godzPracy.setPiatekDo(timePickerPiatekDoGodzinyPracy.getTime());
+        godzPracy.setSobotaOd(timePickerSobotaOdGodzinyPracy.getTime());
+        godzPracy.setSobotaDo(timePickerSobotaDoGodzinyPracy.getTime());
         return godzPracy;
+    }
+
+    private boolean godzinyWprowadzonePrawidlowo(GodzinyPracy godzinyPracy){
+        try{
+            return  godzinyPracy.getPoniedzialekDo().isAfter(godzinyPracy.getPoniedzialekOd()) &&
+                    godzinyPracy.getWtorekDo().isAfter(godzinyPracy.getWtorekOd()) &&
+                    godzinyPracy.getSrodaDo().isAfter(godzinyPracy.getSrodaOd()) &&
+                    godzinyPracy.getCzwartekDo().isAfter(godzinyPracy.getCzwartekOd()) &&
+                    godzinyPracy.getPiatekDo().isAfter(godzinyPracy.getPiatekOd()) &&
+                    godzinyPracy.getSobotaDo().isAfter(godzinyPracy.getSobotaOd());
+        } catch(Exception ex){
+            return false;
+        }
     }
 
     private void dodajGodzinyPracy() {
         GodzinyPracy godzinyPracy = edytujGodzinyPracyNaPodstawieInputu(new GodzinyPracy());
+        if(!godzinyWprowadzonePrawidlowo(godzinyPracy)){
+            showMessageDialog(null, "Godziny muszą być uzypełnone oraz godziny rozpoczęcia muszą być przed godzinami zakończenia");
+            return;
+        }
         repos.getGodzinyPracyRepository().save(godzinyPracy);
-        zeorwanieGodzinPracy();
         showMessageDialog(null, "Dodano godziny pracy pracownika:" + godzinyPracy.getId());
+        zaladujDaneGodzinPracy();
     }
 
     private void edytujGodzinyPracy() {
@@ -533,8 +574,13 @@ public class Main extends JFrame {
         }
         GodzinyPracy godzinyPracy = g.get();
         edytujGodzinyPracyNaPodstawieInputu(godzinyPracy);
+        if(!godzinyWprowadzonePrawidlowo(godzinyPracy)){
+            showMessageDialog(null, "Godziny rozpoczęcia muszą być przed godzinami zakończenia");
+            return;
+        }
         repos.getGodzinyPracyRepository().save(godzinyPracy);
         showMessageDialog(null, "Zedytowano godziny pracy pracownika:"+comboBoxGodzinyPracyPracownicy.getSelectedItem());
+        zaladujDaneGodzinPracy();
     }
 
     private void usunGodzinyPracy() {
@@ -545,40 +591,25 @@ public class Main extends JFrame {
         repos.getGodzinyPracyRepository().deleteById(godzinyPracyOptional.get().getId());
         zeorwanieGodzinPracy();
         showMessageDialog(null, "Usunięto godziny pracy Pracownika o id:"+ comboBoxGodzinyPracyPracownicy.getSelectedItem());
+        zaladujDaneGodzinPracy();
     }
-
 
     private void czasPracy(int czasStart) {
         int czasKoncowy = czasStart + 8;
 
-        textFieldPonidzialekOdGodzinyPracy.setText(String.valueOf(czasStart));
-        textFieldWtorekOdGodzinyPracy.setText(String.valueOf(czasStart));
-        textFieldSrodaOdGodzinyPracy.setText(String.valueOf(czasStart));
-        textFieldCzwartekOdGodzinyPracy.setText(String.valueOf(czasStart));
-        textFieldPiatekOdGodzinyPracy.setText(String.valueOf(czasStart));
-        textFieldSobotaOdGodzinyPracy.setText(String.valueOf(czasStart));
+        timePickerPoniedzialekOdGodzinyPracy.setTime(LocalTime.of(czasStart, 0, 0));
+        timePickerWtorekOdGodzinyPracy.setTime(LocalTime.of(czasStart, 0, 0));
+        timePickerSrodaOdGodzinyPracy.setTime(LocalTime.of(czasStart, 0, 0));
+        timePickerCzwartekOdGodzinyPracy.setTime(LocalTime.of(czasStart, 0, 0));
+        timePickerPiatekOdGodzinyPracy.setTime(LocalTime.of(czasStart, 0, 0));
+        timePickerSobotaOdGodzinyPracy.setTime(LocalTime.of(czasStart, 0, 0));
 
-        textFieldPonidzialekDoGodzinyPracy.setText(String.valueOf(czasKoncowy));
-        textFieldWtorekDoGodzinyPracy.setText(String.valueOf(czasKoncowy));
-        textFieldSrodaDoGodzinyPracy.setText(String.valueOf(czasKoncowy));
-        textFieldCzwartekDoGodzinyPracy.setText(String.valueOf(czasKoncowy));
-        textFieldPiatekDoGodzinyPracy.setText(String.valueOf(czasKoncowy));
-        textFieldSobotaDoGodzinyPracy.setText(String.valueOf(czasKoncowy));
+        timePickerPoniedzialekDoGodzinyPracy.setTime(LocalTime.of(czasKoncowy, 0, 0));
+        timePickerWtorekDoGodzinyPracy.setTime(LocalTime.of(czasKoncowy, 0, 0));
+        timePickerSrodaDoGodzinyPracy.setTime(LocalTime.of(czasKoncowy, 0, 0));
+        timePickerCzwartekDoGodzinyPracy.setTime(LocalTime.of(czasKoncowy, 0, 0));
+        timePickerPiatekDoGodzinyPracy.setTime(LocalTime.of(czasKoncowy, 0, 0));
+        timePickerSobotaDoGodzinyPracy.setTime(LocalTime.of(czasKoncowy, 0, 0));
     }
-
-    private void ustawGodzinyPracy7_15() {
-        czasPracy(7);
-    }
-
-    private void ustawGodzinyPracy8_16() {
-        czasPracy(8);
-    }
-
-    private void ustawGodzinyPracy9_17() {
-        czasPracy(9);
-    }
-
-    private void ustawGodzinyPracy10_18() {
-        czasPracy(10);
-    }
+    //</editor-fold>
 }

@@ -32,7 +32,6 @@ public class GodzinyPracy {
     private LocalTime sobotaOd;
     private LocalTime sobotaDo;
 
-
     public GodzinyPracy(Pracownik pracownik, LocalTime poniedzialekOd, LocalTime poniedzialekDo, LocalTime wtorekOd, LocalTime wtorekDo, LocalTime srodaOd, LocalTime srodaDo, LocalTime czwartekOd, LocalTime czwartekDo, LocalTime piatekOd, LocalTime piatekDo, LocalTime sobotaOd, LocalTime sobotaDo) {
         this.pracownik = pracownik;
         this.poniedzialekOd = poniedzialekOd;
@@ -48,35 +47,4 @@ public class GodzinyPracy {
         this.sobotaOd = sobotaOd;
         this.sobotaDo = sobotaDo;
     }
-
-    public GodzinyPracy(String czasPoczatkowy, String czasKoncowy) {
-    }
-
-    public GodzinyPracy(int czasPoczatkowy, int czasKoncowy) {
-    }
-
-    public static Integer getId(Integer idGodziny) {
-        return idGodziny;
-    }
-
-
-    //Dopisać działanie
-    public void setGodzinyPracy(String godzinyPracy) {
-    }
-    //public GodzinyPracy pobierzWybraneGodzinyZTabeli(JTable tableGodziny, JPanel panel) {
-      //  if (tableGodziny.getSelectedRow() < 0) {
-        //    JOptionPane.showMessageDialog(panel, "Nie wybrano wiersza");
-          //  return null;
-       // }
-       // Integer id = (int) tableGodziny.getValueAt(tableGodziny.getSelectedRow(), 0);
-       // Optional<GodzinyPracy> godzinyPracy = repos.getGodzinyPracyRepository().findById(id);
-       // if (godzinyPracy.isEmpty()) {
-         //   JOptionPane.showMessageDialog(panel, "Godziny nie ma w bazie");
-          //  return null;
-        //}
-        //return godzinyPracy.get();
-    //}
-
-
-
 }

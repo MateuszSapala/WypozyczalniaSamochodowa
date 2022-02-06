@@ -7,10 +7,10 @@ import org.springframework.stereotype.Component;
 
 import javax.swing.*;
 import java.awt.*;
-import java.sql.PreparedStatement;
-import java.util.Arrays;
 import java.util.Optional;
 
+import static edu.uni.lodz.pl.WypozyczalniaSamochodowa.utils.Validators.hasloValidator;
+import static edu.uni.lodz.pl.WypozyczalniaSamochodowa.utils.Validators.peselValidator;
 import static javax.swing.JOptionPane.showMessageDialog;
 
 @Component
@@ -22,18 +22,14 @@ public class Rejestracja extends JFrame {
     private JTextField textFieldLogin;
     private JPasswordField passwordField1;
     private JPasswordField passwordField2;
-    private JCheckBox checkBoxKobieta;
-    private JCheckBox checkBoxMezczyzna;
     private JButton buttonUtworzKonto;
     private JButton buttonAnuluj;
     private JPanel panel;
     private JRadioButton radioButtonKobieta;
     private JRadioButton radioButtonMezczyzna;
-    private PreparedStatement stat;
 
     public Rejestracja(Repos repos) {
         this.repos = repos;
-
 
         setTitle("Rejestracja");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -65,33 +61,24 @@ public class Rejestracja extends JFrame {
         else if(klientOptional1.isPresent()) {
             showMessageDialog(null, "Podany pesel jest już użyty przez innego użytkownika!");
         }
-        else if (textFieldImie.getText().isEmpty() || textFieldNazwisko.getText().isEmpty() || textFieldPesel.getText().isEmpty() || textFieldLogin.getText().isEmpty() || Arrays.toString(passwordField1.getPassword()).isEmpty() || Arrays.toString(passwordField2.getPassword()).isEmpty()) {
+        else if (textFieldImie.getText().isEmpty() || textFieldNazwisko.getText().isEmpty() || textFieldPesel.getText().isEmpty() || textFieldLogin.getText().isEmpty() || String.copyValueOf(passwordField1.getPassword()).isEmpty() || String.copyValueOf(passwordField2.getPassword()).isEmpty()) {
             showMessageDialog(null, "Wypełnij wszystkie pola!");
         }
-        else if (!(Arrays.toString(passwordField1.getPassword()).equals(Arrays.toString(passwordField2.getPassword())))) {
+        else if (!(String.copyValueOf(passwordField1.getPassword()).equals(String.copyValueOf(passwordField2.getPassword())))) {
             showMessageDialog(null, "Podane hasło i powtórzone hasło nie są takie same!");
         }
         else if(!peselValidator(textFieldPesel.getText())){
             showMessageDialog(null, "Błędny pesel!");
         }
-        else if(!hasloValidator(Arrays.toString(passwordField1.getPassword()))){
+        else if(!hasloValidator(String.copyValueOf(passwordField1.getPassword()))){
             showMessageDialog(null,"Hasło musi zawierać od 8 do 20 znaków, minimum jedną małą literę, dużą literę, cyfrę i symbol!" );
         }
         else {
-            Klient k1 = new Klient(textFieldImie.getText(), textFieldNazwisko.getText(), textFieldPesel.getText(), textFieldLogin.getText(), passwordField1.getText(), plec);
+            Klient k1 = new Klient(textFieldImie.getText(), textFieldNazwisko.getText(), textFieldPesel.getText(), textFieldLogin.getText(), String.copyValueOf(passwordField1.getPassword()), plec);
             showMessageDialog(null, "Konto utworzone!");
             repos.getKlientRepository().save(k1);
             dispose();
         }
-    }
-
-    private boolean peselValidator(String pesel) {
-        if (pesel.length() != 11) {
-            return false;
-        } else return pesel.matches("[+-]?\\d*(\\.\\d+)?");
-    }
-    private boolean hasloValidator(String haslo){
-        return haslo.matches("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#&()–[{}]:;',?/*~$^+=<>]).{8,20}$");
     }
 }
 

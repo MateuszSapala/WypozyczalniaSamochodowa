@@ -5,8 +5,8 @@ import edu.uni.lodz.pl.WypozyczalniaSamochodowa.model.klient.Klient;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.Arrays;
 
+import static edu.uni.lodz.pl.WypozyczalniaSamochodowa.utils.Validators.hasloValidator;
 import static javax.swing.JOptionPane.showMessageDialog;
 
 public class KlientZmianaHasla extends JFrame {
@@ -35,26 +35,22 @@ public class KlientZmianaHasla extends JFrame {
         buttonAnuluj.addActionListener(e -> anuluj());
     }
     private void zmienHaslo(){
-        if (Arrays.toString(passwordField1.getPassword()).isEmpty() || Arrays.toString(passwordField2.getPassword()).isEmpty()) {
+        if (String.copyValueOf(passwordField1.getPassword()).isEmpty() || String.copyValueOf(passwordField2.getPassword()).isEmpty()) {
             showMessageDialog(null, "Oba pola muszą być wypełnione!");
         }
-        else if(!(Arrays.toString(passwordField1.getPassword()).equals(Arrays.toString(passwordField2.getPassword())))){
+        else if(!(String.copyValueOf(passwordField1.getPassword()).equals(String.copyValueOf(passwordField2.getPassword())))){
             showMessageDialog(null, "Hasło i powtórzone hasło muszą być takie same!");
         }
-        else if(!hasloValidator(Arrays.toString(passwordField1.getPassword()))){
+        else if(!hasloValidator(String.copyValueOf(passwordField1.getPassword()))){
             showMessageDialog(null,"Hasło musi zawierać od 8 do 20 znaków, minimum jedną małą literę, dużą literę, cyfrę i symbol!" );
         }
         else {
             showMessageDialog(null, "Hasło zmienione!");
-            zalogowanyKlient.setHaslo(Arrays.toString(passwordField1.getPassword()));
+            zalogowanyKlient.setHaslo(String.copyValueOf(passwordField1.getPassword()));
             repos.getKlientRepository().save(zalogowanyKlient);
             klientForm.zaladujDanePonownie();
             dispose();
         }
     }
     private void anuluj() { dispose(); }
-
-    private boolean hasloValidator(String haslo){
-        return haslo.matches("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#&()–[{}]:;',?/*~$^+=<>]).{8,20}$");
-    }
 }

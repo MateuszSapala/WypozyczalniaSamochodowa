@@ -6,7 +6,6 @@ import edu.uni.lodz.pl.WypozyczalniaSamochodowa.model.klient.Klient;
 import javax.swing.*;
 import java.awt.*;
 import java.util.Arrays;
-import java.util.Optional;
 
 import static javax.swing.JOptionPane.showMessageDialog;
 

@@ -1,7 +1,6 @@
 package edu.uni.lodz.pl.WypozyczalniaSamochodowa.ui.main;
 
 import edu.uni.lodz.pl.WypozyczalniaSamochodowa.model.Repos;
-import edu.uni.lodz.pl.WypozyczalniaSamochodowa.model.auto.Auto;
 import edu.uni.lodz.pl.WypozyczalniaSamochodowa.model.pracownik.Pracownik;
 import lombok.RequiredArgsConstructor;
 
@@ -14,11 +13,11 @@ public class PracownikService {
     private final Repos repos;
 
     public DefaultTableModel tabelaPracownicy() {
-        String[] columnNames = {"Id", "Imie", "Nazwisko", "Pesel", "Plec", "Godziny Pracy", "Login", "Haslo"};
+        String[] columnNames = {"Id", "Imie", "Nazwisko", "Pesel", "Plec", "Login", "Haslo"};
         Object[][] data = repos.getPracownikRepository()
                 .findAll()
                 .stream()
-                .map(a -> new Object[]{a.getId(), a.getImie(), a.getNazwisko(), a.getPesel(), a.getPlec(), a.getGodzinyPracy(), a.getLogin(), a.getHaslo()})
+                .map(a -> new Object[]{a.getId(), a.getImie(), a.getNazwisko(), a.getPesel(), a.getPlec(), a.getLogin(), a.getHaslo()})
                 .toArray(Object[][]::new);
         return new DefaultTableModel(data, columnNames);
 }

@@ -3,10 +3,7 @@ package edu.uni.lodz.pl.WypozyczalniaSamochodowa.ui.rejestracja;
 import edu.uni.lodz.pl.WypozyczalniaSamochodowa.model.Plec;
 import edu.uni.lodz.pl.WypozyczalniaSamochodowa.model.Repos;
 import edu.uni.lodz.pl.WypozyczalniaSamochodowa.model.klient.Klient;
-import edu.uni.lodz.pl.WypozyczalniaSamochodowa.model.klient.KlientRepository;
-import edu.uni.lodz.pl.WypozyczalniaSamochodowa.ui.klient.KlientForm;
 import org.springframework.stereotype.Component;
-import org.springframework.util.NumberUtils;
 
 import javax.swing.*;
 import java.awt.*;

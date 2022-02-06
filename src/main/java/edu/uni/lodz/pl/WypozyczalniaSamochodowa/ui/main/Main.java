@@ -14,6 +14,8 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.time.LocalTime;
@@ -35,7 +37,6 @@ public class Main extends JFrame {
 
     private Integer idWybranegoAuta;
     private Integer idWybranegoPracownika;
-    private Integer idWybranejGodzinyPracy;
 
 
     //<editor-fold desc="UI">
@@ -60,7 +61,6 @@ public class Main extends JFrame {
     private JTextField textFieldPracownikImie;
     private JTextField textFieldPracownikNazwisko;
     private JTextField textFieldPracownikPesel;
-    private JTextField textFieldPracownikGodziny;
     private JTextField textFieldPracownikLogin;
     private JTextField textFieldPracownikHaslo;
     private JComboBox<Plec> comboBoxPracownikPlec;
@@ -161,6 +161,12 @@ public class Main extends JFrame {
         button8_16.addActionListener(e -> ustawGodzinyPracy8_16());
         button9_17.addActionListener(e -> ustawGodzinyPracy9_17());
         button10_18.addActionListener(e -> ustawGodzinyPracy10_18());
+        comboBoxGodzinyPracyPracownicy.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                zaladujDaneGodzinPracy();
+            }
+        });
     }
 
     private void zaladujDaneGodzinPracy(JTable tableGodziny, JPanel panel) {
@@ -172,7 +178,7 @@ public class Main extends JFrame {
         zaladujDaneDlaAut();
         zaladujDaneKlientow();
         zaladujRezerwacje();
-        // zaladujDaneGodzinPracy();
+        zaladujDaneGodzinPracy();
     }
 
     //<editor-fold desc="Pracownicy">
@@ -201,7 +207,6 @@ public class Main extends JFrame {
         textFieldPracownikImie.setText("");
         textFieldPracownikNazwisko.setText("");
         textFieldPracownikPesel.setText("");
-        textFieldPracownikGodziny.setText("");
         comboBoxPracownikPlec.setSelectedIndex(0);
         textFieldPracownikLogin.setText("");
         textFieldPracownikHaslo.setText("");
@@ -212,7 +217,6 @@ public class Main extends JFrame {
         textFieldPracownikImie.setText(String.valueOf(p.getImie()));
         textFieldPracownikNazwisko.setText(String.valueOf(p.getNazwisko()));
         textFieldPracownikPesel.setText(String.valueOf(p.getPesel()));
-        textFieldPracownikGodziny.setText(String.valueOf(p.getGodzinyPracy()));
         comboBoxPracownikPlec.setSelectedItem(p.getPlec());
         textFieldPracownikLogin.setText(String.valueOf(p.getLogin()));
         textFieldPracownikHaslo.setText(String.valueOf(p.getHaslo()));
@@ -309,7 +313,6 @@ public class Main extends JFrame {
         pracownik.setImie(textFieldPracownikImie.getText());
         pracownik.setNazwisko(textFieldPracownikNazwisko.getText());
         pracownik.setPesel(textFieldPracownikPesel.getText());
-//      pracownik.setGodzinyPracy(textFieldPracownikGodziny.getText());
         pracownik.setPlec((Plec) comboBoxPracownikPlec.getSelectedItem());
         pracownik.setLogin(textFieldPracownikLogin.getText());
         pracownik.setHaslo(textFieldPracownikHaslo.getText());
@@ -463,7 +466,6 @@ public class Main extends JFrame {
     private void zaladujRezerwacje(){ tableRezerwacje.setModel(wypozyczenieService.allWypozyczeniaTabela());}
 
     private void zeorwanieGodzinPracy() {
-
         textFieldPonidzialekOdGodzinyPracy.setText("");
         textFieldPonidzialekDoGodzinyPracy.setText("");
         textFieldWtorekOdGodzinyPracy.setText("");
@@ -476,12 +478,15 @@ public class Main extends JFrame {
         textFieldPiatekDoGodzinyPracy.setText("");
         textFieldSobotaOdGodzinyPracy.setText("");
         textFieldSobotaDoGodzinyPracy.setText("");
-
-
     }
 
-    private void uzupelnijInputDlaGodzinPracy(GodzinyPracy godzinyPracy) {
+    private void zaladujDaneGodzinPracy(){
+        Optional<GodzinyPracy> godzinyPracyOptional = repos.getGodzinyPracyRepository().findByPracownik((Pracownik) comboBoxGodzinyPracyPracownicy.getSelectedItem());
+        zeorwanieGodzinPracy();
+        godzinyPracyOptional.ifPresent(this::uzupelnijInputDlaGodzin);
+    }
 
+    private void uzupelnijInputDlaGodzin(GodzinyPracy godzinyPracy) {
         textFieldPonidzialekOdGodzinyPracy.setText(String.valueOf(godzinyPracy.getPoniedzialekOd()));
         textFieldPonidzialekDoGodzinyPracy.setText(String.valueOf(godzinyPracy.getPoniedzialekDo()));
         textFieldWtorekOdGodzinyPracy.setText(String.valueOf(godzinyPracy.getWtorekOd()));
@@ -494,65 +499,10 @@ public class Main extends JFrame {
         textFieldPiatekDoGodzinyPracy.setText(String.valueOf(godzinyPracy.getPiatekDo()));
         textFieldSobotaOdGodzinyPracy.setText(String.valueOf(godzinyPracy.getSobotaOd()));
         textFieldSobotaDoGodzinyPracy.setText(String.valueOf(godzinyPracy.getSobotaDo()));
-
     }
-
-
-    //private void zaladujDaneGodzinPracy(){ tableGodziny.setModel(GodzinyService.tabelaGodziny()); }
-
-    private void zaladujDaneSzukanychGodzin() {
-      try {
-          Integer idGodziny = Integer.valueOf(textFieldSzukajGodziny.getText());
-
-          showMessageDialog(null, "GodzinyPracy Pracownika nr:"+idGodziny);
-
-          Optional<GodzinyPracy> GodzinyOptional = repos.getGodzinyPracyRepository().findById(idGodziny);
-
-
-          if (GodzinyOptional.isEmpty()) {
-              showMessageDialog(null, "Brak takiej godziny!");
-          } else {
-              idWybranejGodzinyPracy = GodzinyPracy.getId(idGodziny);
-              uzupelnijInputDlaGodzin(GodzinyOptional.get());
-          }
-
-      }catch (NumberFormatException e )
-      {
-          showMessageDialog(null, "Muisz podać nunmer");
-      }
-
-    }
-
-    private GodzinyPracy uzupelnijInputDlaGodzin(GodzinyPracy godzinyPracy) {
-
-
-        textFieldPonidzialekOdGodzinyPracy.setText(String.valueOf(godzinyPracy.getPoniedzialekOd()));
-        textFieldPonidzialekDoGodzinyPracy.setText(String.valueOf(godzinyPracy.getPoniedzialekDo()));
-        textFieldWtorekOdGodzinyPracy.setText(String.valueOf(godzinyPracy.getWtorekOd()));
-        textFieldWtorekDoGodzinyPracy.setText(String.valueOf(godzinyPracy.getWtorekDo()));
-        textFieldSrodaOdGodzinyPracy.setText(String.valueOf(godzinyPracy.getSrodaOd()));
-        textFieldSrodaDoGodzinyPracy.setText(String.valueOf(godzinyPracy.getSrodaDo()));
-        textFieldCzwartekOdGodzinyPracy.setText(String.valueOf(godzinyPracy.getCzwartekOd()));
-        textFieldCzwartekDoGodzinyPracy.setText(String.valueOf(godzinyPracy.getCzwartekDo()));
-        textFieldPiatekOdGodzinyPracy.setText(String.valueOf(godzinyPracy.getPiatekOd()));
-        textFieldPiatekDoGodzinyPracy.setText(String.valueOf(godzinyPracy.getPiatekDo()));
-        textFieldSobotaOdGodzinyPracy.setText(String.valueOf(godzinyPracy.getSobotaOd()));
-        textFieldSobotaDoGodzinyPracy.setText(String.valueOf(godzinyPracy.getSobotaDo()));
-
-
-        return godzinyPracy;
-
-    }
-
-
-
-
-
 
     private GodzinyPracy edytujGodzinyPracyNaPodstawieInputu(GodzinyPracy godzPracy) {
-
-
-
+        godzPracy.setPracownik((Pracownik) comboBoxGodzinyPracyPracownicy.getSelectedItem());
         godzPracy.setPoniedzialekOd(LocalTime.of(Integer.parseInt(textFieldPonidzialekOdGodzinyPracy.getText()),0) );
         godzPracy.setPoniedzialekDo(LocalTime.of(Integer.parseInt(textFieldPonidzialekDoGodzinyPracy.getText()),0) );
         godzPracy.setWtorekOd(LocalTime.of(Integer.parseInt(textFieldWtorekOdGodzinyPracy.getText()),0) );
@@ -565,33 +515,18 @@ public class Main extends JFrame {
         godzPracy.setPiatekDo(LocalTime.of(Integer.parseInt(textFieldPiatekDoGodzinyPracy.getText()),0) );
         godzPracy.setSobotaOd(LocalTime.of(Integer.parseInt(textFieldSobotaDoGodzinyPracy.getText()),0) );
         godzPracy.setSobotaDo(LocalTime.of(Integer.parseInt(textFieldSobotaDoGodzinyPracy.getText()),0) );
-
-
-
         return godzPracy;
-
     }
 
     private void dodajGodzinyPracy() {
-       GodzinyPracy godzinyPracy = edytujGodzinyPracyNaPodstawieInputu(new GodzinyPracy());
-
-
-
-
+        GodzinyPracy godzinyPracy = edytujGodzinyPracyNaPodstawieInputu(new GodzinyPracy());
         repos.getGodzinyPracyRepository().save(godzinyPracy);
-
-
         zeorwanieGodzinPracy();
-
-        showMessageDialog(null, "Dodano godziny pracy pracownika:"+godzinyPracy.getId());
-
+        showMessageDialog(null, "Dodano godziny pracy pracownika:" + godzinyPracy.getId());
     }
 
-
-
-
     private void edytujGodzinyPracy() {
-        Optional<GodzinyPracy> g = repos.getGodzinyPracyRepository().findById(idWybranejGodzinyPracy);
+        Optional<GodzinyPracy> g = repos.getGodzinyPracyRepository().findByPracownik((Pracownik) comboBoxGodzinyPracyPracownicy.getSelectedItem());
         if (g.isEmpty()) {
             showMessageDialog(null, "GodzinPracy nie ma w bazie");
             return;
@@ -599,39 +534,29 @@ public class Main extends JFrame {
         GodzinyPracy godzinyPracy = g.get();
         edytujGodzinyPracyNaPodstawieInputu(godzinyPracy);
         repos.getGodzinyPracyRepository().save(godzinyPracy);
-
-        zeorwanieGodzinPracy();
-        showMessageDialog(null, "Zedytowano godziny pracy pracownika:"+idWybranejGodzinyPracy);
+        showMessageDialog(null, "Zedytowano godziny pracy pracownika:"+comboBoxGodzinyPracyPracownicy.getSelectedItem());
     }
 
-
-
-
     private void usunGodzinyPracy() {
-        repos.getGodzinyPracyRepository().deleteById(idWybranejGodzinyPracy);
-
+        Optional<GodzinyPracy> godzinyPracyOptional = repos.getGodzinyPracyRepository().findByPracownik((Pracownik) comboBoxGodzinyPracyPracownicy.getSelectedItem());
+        if(godzinyPracyOptional.isEmpty()){
+            return;
+        }
+        repos.getGodzinyPracyRepository().deleteById(godzinyPracyOptional.get().getId());
         zeorwanieGodzinPracy();
-        showMessageDialog(null, "Usunięto godziny pracy Pracownika o id:"+ idWybranejGodzinyPracy);
+        showMessageDialog(null, "Usunięto godziny pracy Pracownika o id:"+ comboBoxGodzinyPracyPracownicy.getSelectedItem());
     }
 
 
     private void czasPracy(int czasStart) {
-
-       // String czasPoczatkowy = czasStart + ":00";
-        //String czasKoncowy = czasStart + 8 + ":00";
-
-        int czasPoczatkowy = czasStart  ;
         int czasKoncowy = czasStart + 8;
 
-        GodzinyPracy godzinyPracy = new GodzinyPracy(czasPoczatkowy, czasKoncowy);
-
-
-        textFieldPonidzialekOdGodzinyPracy.setText(String.valueOf(czasPoczatkowy));
-        textFieldWtorekOdGodzinyPracy.setText(String.valueOf(czasPoczatkowy));
-        textFieldSrodaOdGodzinyPracy.setText(String.valueOf(czasPoczatkowy));
-        textFieldCzwartekOdGodzinyPracy.setText(String.valueOf(czasPoczatkowy));
-        textFieldPiatekOdGodzinyPracy.setText(String.valueOf(czasPoczatkowy));
-        textFieldSobotaOdGodzinyPracy.setText(String.valueOf(czasPoczatkowy));
+        textFieldPonidzialekOdGodzinyPracy.setText(String.valueOf(czasStart));
+        textFieldWtorekOdGodzinyPracy.setText(String.valueOf(czasStart));
+        textFieldSrodaOdGodzinyPracy.setText(String.valueOf(czasStart));
+        textFieldCzwartekOdGodzinyPracy.setText(String.valueOf(czasStart));
+        textFieldPiatekOdGodzinyPracy.setText(String.valueOf(czasStart));
+        textFieldSobotaOdGodzinyPracy.setText(String.valueOf(czasStart));
 
         textFieldPonidzialekDoGodzinyPracy.setText(String.valueOf(czasKoncowy));
         textFieldWtorekDoGodzinyPracy.setText(String.valueOf(czasKoncowy));
@@ -639,27 +564,21 @@ public class Main extends JFrame {
         textFieldCzwartekDoGodzinyPracy.setText(String.valueOf(czasKoncowy));
         textFieldPiatekDoGodzinyPracy.setText(String.valueOf(czasKoncowy));
         textFieldSobotaDoGodzinyPracy.setText(String.valueOf(czasKoncowy));
-
     }
 
     private void ustawGodzinyPracy7_15() {
-
         czasPracy(7);
-
     }
 
     private void ustawGodzinyPracy8_16() {
         czasPracy(8);
-
     }
 
     private void ustawGodzinyPracy9_17() {
         czasPracy(9);
-
     }
 
     private void ustawGodzinyPracy10_18() {
         czasPracy(10);
-
     }
 }

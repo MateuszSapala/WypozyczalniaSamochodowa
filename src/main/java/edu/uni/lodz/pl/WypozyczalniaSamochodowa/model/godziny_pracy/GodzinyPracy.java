@@ -1,19 +1,12 @@
 package edu.uni.lodz.pl.WypozyczalniaSamochodowa.model.godziny_pracy;
 
-import edu.uni.lodz.pl.WypozyczalniaSamochodowa.model.Repos;
 import edu.uni.lodz.pl.WypozyczalniaSamochodowa.model.pracownik.Pracownik;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 import lombok.Setter;
 
 import javax.persistence.*;
-import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
-import java.sql.Time;
 import java.time.LocalTime;
-import java.util.Optional;
 
 @NoArgsConstructor
 @Getter
@@ -24,6 +17,8 @@ public class GodzinyPracy {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+    @OneToOne
+    private Pracownik pracownik;
     private LocalTime poniedzialekOd;
     private LocalTime poniedzialekDo;
     private LocalTime wtorekOd;
@@ -36,11 +31,10 @@ public class GodzinyPracy {
     private LocalTime piatekDo;
     private LocalTime sobotaOd;
     private LocalTime sobotaDo;
-    @OneToOne
-    private Pracownik pracownik;
 
 
-    public GodzinyPracy(LocalTime poniedzialekOd, LocalTime poniedzialekDo, LocalTime wtorekOd, LocalTime wtorekDo, LocalTime srodaOd, LocalTime srodaDo, LocalTime czwartekOd, LocalTime czwartekDo, LocalTime piatekOd, LocalTime piatekDo, LocalTime sobotaOd, LocalTime sobotaDo, Pracownik pracownik) {
+    public GodzinyPracy(Pracownik pracownik, LocalTime poniedzialekOd, LocalTime poniedzialekDo, LocalTime wtorekOd, LocalTime wtorekDo, LocalTime srodaOd, LocalTime srodaDo, LocalTime czwartekOd, LocalTime czwartekDo, LocalTime piatekOd, LocalTime piatekDo, LocalTime sobotaOd, LocalTime sobotaDo) {
+        this.pracownik = pracownik;
         this.poniedzialekOd = poniedzialekOd;
         this.poniedzialekDo = poniedzialekDo;
         this.wtorekOd = wtorekOd;
@@ -53,7 +47,6 @@ public class GodzinyPracy {
         this.piatekDo = piatekDo;
         this.sobotaOd = sobotaOd;
         this.sobotaDo = sobotaDo;
-        this.pracownik = pracownik;
     }
 
     public GodzinyPracy(String czasPoczatkowy, String czasKoncowy) {

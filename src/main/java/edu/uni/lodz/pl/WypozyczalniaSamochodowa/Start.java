@@ -14,8 +14,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.stereotype.Component;
 
 import java.time.LocalTime;
 import java.util.List;
@@ -43,19 +41,20 @@ public class Start implements CommandLineRunner {
         dodajPracownikow();
         dodajKlientow();
         dodajAuta();
+
     }
 
     private void dodajPracownikow() {
         LocalTime start = LocalTime.of(8,0,0);
         LocalTime end =  LocalTime.of(16, 0, 0);
-        GodzinyPracy g1 = new GodzinyPracy(start, end, start, end, start, end, start, end, start, end, start, end);
-        GodzinyPracy g2 = new GodzinyPracy(start, end, start, end, start, end, start, end, start, end, start, end);
-        GodzinyPracy g3 = new GodzinyPracy(start, end, start, end, start, end, start, end, start, end, start, end);
-        Pracownik p1 = new Pracownik("Adam", "Nowak", "32454320034", "admin", "pass", Plec.MEZCZYZNA, g1);
-        Pracownik p2 = new Pracownik("Tomasz", "Kowalski", "35653354198", "employee1", "pass1", Plec.MEZCZYZNA, g2);
-        Pracownik p3 = new Pracownik("Anna", "Nowakowska", "32565348453", "employee2", "pass2", Plec.KOBIETA, g3);
-        repos.getGodzinyPracyRepository().saveAll(List.of(g1, g2, g3));
+        Pracownik p1 = new Pracownik("Adam", "Nowak", "32454320034", "admin", "pass", Plec.MEZCZYZNA);
+        Pracownik p2 = new Pracownik("Tomasz", "Kowalski", "35653354198", "employee1", "pass1", Plec.MEZCZYZNA);
+        Pracownik p3 = new Pracownik("Anna", "Nowakowska", "32565348453", "employee2", "pass2", Plec.KOBIETA);
+        GodzinyPracy g1 = new GodzinyPracy(p1, start, end, start, end, start, end, start, end, start, end, start, end);
+        GodzinyPracy g2 = new GodzinyPracy(p2, start, end, start, end, start, end, start, end, start, end, start, end);
+        GodzinyPracy g3 = new GodzinyPracy(p3, start, end, start, end, start, end, start, end, start, end, start, end);
         repos.getPracownikRepository().saveAll(List.of(p1, p2, p3));
+        repos.getGodzinyPracyRepository().saveAll(List.of(g1, g2, g3));
     }
 
     private void dodajKlientow() {
@@ -72,4 +71,6 @@ public class Start implements CommandLineRunner {
         Auto a2 = new Auto("Volkswagen", "Passat", Nadwozie.SEDAN, Paliwo.DIESEL, Skrzynia.MANUALNA, 2015, 100);
         repos.getAutoRepository().saveAll(List.of(a1, a2));
     }
+
+
 }

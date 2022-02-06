@@ -13,11 +13,11 @@ public class PracownikService {
     private final Repos repos;
 
     public DefaultTableModel tabelaPracownicy() {
-        String[] columnNames = {"Id", "Imie", "Nazwisko", "Pesel", "Plec", "Godziny Pracy", "Login", "Haslo"};
+        String[] columnNames = {"Id", "Imie", "Nazwisko", "Pesel", "Plec", "Login", "Haslo"};
         Object[][] data = repos.getPracownikRepository()
                 .findAll()
                 .stream()
-                .map(a -> new Object[]{a.getId(), a.getImie(), a.getNazwisko(), a.getPesel(), a.getPlec(), a.getGodzinyPracy(), a.getLogin(), a.getHaslo()})
+                .map(a -> new Object[]{a.getId(), a.getImie(), a.getNazwisko(), a.getPesel(), a.getPlec(), a.getLogin(), a.getHaslo()})
                 .toArray(Object[][]::new);
         return new DefaultTableModel(data, columnNames);
 }
@@ -34,5 +34,13 @@ public class PracownikService {
             return null;
         }
         return p.get();
+    }
+
+    public DefaultComboBoxModel comboBoxPracownicy(){
+        Pracownik[] pracownikArray = repos.getPracownikRepository()
+                .findAll()
+                .stream()
+                .toArray(Pracownik[]::new);
+        return new DefaultComboBoxModel(pracownikArray);
     }
 }

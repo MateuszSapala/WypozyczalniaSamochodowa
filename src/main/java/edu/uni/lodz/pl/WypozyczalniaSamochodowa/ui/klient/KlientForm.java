@@ -11,11 +11,8 @@ import edu.uni.lodz.pl.WypozyczalniaSamochodowa.ui.main.WypozyczenieService;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Objects;
@@ -134,7 +131,7 @@ public class KlientForm extends JFrame {
                koszt = hourDifference * wybraneAuto.getCenaZaGodzine();
            }
         }
-        labelCenaValue.setText(String.valueOf(koszt) +" zł");
+        labelCenaValue.setText(koszt +" zł");
      }
 
 
@@ -180,11 +177,6 @@ public class KlientForm extends JFrame {
      private Wypozyczenie stworzWypozyczenie( LocalDateTime dataOd, LocalDateTime dataDo, Auto auto)
      {
          return new Wypozyczenie(dataOd,dataDo,zalogowanyKlient,auto,Integer.parseInt(labelCenaValue.getText().substring(0,labelCenaValue.getText().length() - 3)));
-     }
-
-
-     private boolean dataPozniejszaLubTakaSama(LocalDateTime data1, LocalDateTime data2){
-        return data1.isAfter(data2) || data1.isEqual(data2);
      }
 
     private boolean dataWczesniejszaLubTakaSama(LocalDateTime data1, LocalDateTime data2){

@@ -23,16 +23,18 @@ public class Pracownik {
     private String login;
     private String haslo;
     private Plec plec;
-    @OneToOne
-    private GodzinyPracy godzinyPracy;
 
-    public Pracownik(String imie, String nazwisko, String pesel, String login, String haslo, Plec plec, GodzinyPracy godzinyPracy) {
+    public Pracownik(String imie, String nazwisko, String pesel, String login, String haslo, Plec plec) {
         this.imie = imie;
         this.nazwisko = nazwisko;
         this.pesel = pesel;
         this.login = login;
         this.haslo = haslo;
         this.plec = plec;
-        this.godzinyPracy = godzinyPracy;
+    }
+
+    @Override
+    public String toString() {
+        return imie + " " + nazwisko + " " + pesel;
     }
 }

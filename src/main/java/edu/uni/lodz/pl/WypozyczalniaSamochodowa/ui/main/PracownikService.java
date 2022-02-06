@@ -1,6 +1,7 @@
 package edu.uni.lodz.pl.WypozyczalniaSamochodowa.ui.main;
 
 import edu.uni.lodz.pl.WypozyczalniaSamochodowa.model.Repos;
+import edu.uni.lodz.pl.WypozyczalniaSamochodowa.model.auto.Auto;
 import edu.uni.lodz.pl.WypozyczalniaSamochodowa.model.pracownik.Pracownik;
 import lombok.RequiredArgsConstructor;
 
@@ -34,5 +35,13 @@ public class PracownikService {
             return null;
         }
         return p.get();
+    }
+
+    public DefaultComboBoxModel comboBoxPracownicy(){
+        Pracownik[] pracownikArray = repos.getPracownikRepository()
+                .findAll()
+                .stream()
+                .toArray(Pracownik[]::new);
+        return new DefaultComboBoxModel(pracownikArray);
     }
 }

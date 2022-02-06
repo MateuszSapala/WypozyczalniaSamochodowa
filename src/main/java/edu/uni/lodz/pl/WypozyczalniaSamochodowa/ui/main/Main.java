@@ -6,17 +6,20 @@ import edu.uni.lodz.pl.WypozyczalniaSamochodowa.model.auto.Auto;
 import edu.uni.lodz.pl.WypozyczalniaSamochodowa.model.auto.Nadwozie;
 import edu.uni.lodz.pl.WypozyczalniaSamochodowa.model.auto.Paliwo;
 import edu.uni.lodz.pl.WypozyczalniaSamochodowa.model.auto.Skrzynia;
+import edu.uni.lodz.pl.WypozyczalniaSamochodowa.model.godziny_pracy.GodzinyPracy;
 import edu.uni.lodz.pl.WypozyczalniaSamochodowa.model.klient.Klient;
 import edu.uni.lodz.pl.WypozyczalniaSamochodowa.model.pracownik.Pracownik;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableColumnModel;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.time.LocalTime;
 import java.util.Calendar;
-import java.util.Optional;
 import java.util.List;
+import java.util.Optional;
 
 import static javax.swing.JOptionPane.showMessageDialog;
 
@@ -28,8 +31,11 @@ public class Main extends JFrame {
     private final KlientService klientService;
     private final Pracownik zalogowanyPracownik;
     private final WypozyczenieService wypozyczenieService;
+    private final GodzinyService godzinyService;
+
     private Integer idWybranegoAuta;
     private Integer idWybranegoPracownika;
+    private Integer idWybranejGodzinyPracy;
 
 
     //<editor-fold desc="UI">
@@ -61,9 +67,31 @@ public class Main extends JFrame {
     private JTable tableKlienci;
     private JTextField textFieldSzukajKlienta;
     private JButton buttonSzukajKlienta;
+    private JTextField textFieldPonidzialekDoGodzinyPracy;
+    private JTextField textFieldPonidzialekOdGodzinyPracy;
+    private JTextField textFieldSrodaOdGodzinyPracy;
+    private JTextField textFieldWtorekOdGodzinyPracy;
+    private JTextField textFieldCzwartekOdGodzinyPracy;
+    private JTextField textFieldPiatekOdGodzinyPracy;
+    private JTextField textFieldSobotaOdGodzinyPracy;
+    private JTextField textFieldWtorekDoGodzinyPracy;
+    private JTextField textFieldSrodaDoGodzinyPracy;
+    private JTextField textFieldCzwartekDoGodzinyPracy;
+    private JTextField textFieldPiatekDoGodzinyPracy;
+    private JTextField textFieldSobotaDoGodzinyPracy;
+    private JButton button10_18;
+    private JButton button9_17;
+    private JButton button8_16;
+    private JButton buttonDodajGodzinyPracy;
+    private JButton buttonEdytujGodzinyPracy;
+    private JButton buttonUsuńGodzinyPracy;
+    private JButton button7_15;
+    private JTextField textFieldSzukajGodziny;
+    private JComboBox comboBoxGodzinyPracyPracownicy;
     private JTable tableRezerwacje;
     private DefaultTableColumnModel model;
     private JLabel jlabel;
+    private java.sql.Time Time;
     //</editor-fold>
 
     public Main(Repos repos, Pracownik zalogowanyPracownik) {
@@ -74,6 +102,7 @@ public class Main extends JFrame {
         this.klientService = new KlientService(repos);
         this.wypozyczenieService = new WypozyczenieService(repos);
 
+        this.godzinyService = new GodzinyService(repos);
         setTitle("Wypożyczalnia samochodowa");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setPreferredSize(new Dimension(1500, 600));
@@ -116,20 +145,34 @@ public class Main extends JFrame {
 
         //<editor-fold desc="Spinners">
         spinnerAutoCenaZaGodzine.setModel(new SpinnerNumberModel(1, 1, 1000, 1));
-        spinnerAutoRokProdukcji.setModel(new SpinnerNumberModel(Calendar.getInstance().get(Calendar.YEAR)-5, 1900, Calendar.getInstance().get(Calendar.YEAR), 1));
+        spinnerAutoRokProdukcji.setModel(new SpinnerNumberModel(Calendar.getInstance().get(Calendar.YEAR) - 5, 1900, Calendar.getInstance().get(Calendar.YEAR), 1));
 
-        JSpinner.DefaultEditor spinnerEditorAutoCenaZaGodzine = (JSpinner.DefaultEditor)(spinnerAutoCenaZaGodzine.getEditor());
+        JSpinner.DefaultEditor spinnerEditorAutoCenaZaGodzine = (JSpinner.DefaultEditor) (spinnerAutoCenaZaGodzine.getEditor());
         spinnerEditorAutoCenaZaGodzine.getTextField().setHorizontalAlignment(JTextField.LEFT);
-        JSpinner.DefaultEditor spinnerEditorAutoRokProdukcji = (JSpinner.DefaultEditor)(spinnerAutoRokProdukcji.getEditor());
+        JSpinner.DefaultEditor spinnerEditorAutoRokProdukcji = (JSpinner.DefaultEditor) (spinnerAutoRokProdukcji.getEditor());
         spinnerEditorAutoRokProdukcji.getTextField().setHorizontalAlignment(JTextField.LEFT);
         //</editor-fold>
+
+
+        buttonDodajGodzinyPracy.addActionListener(e -> dodajGodzinyPracy());
+        buttonEdytujGodzinyPracy.addActionListener(e -> edytujGodzinyPracy());
+        buttonUsuńGodzinyPracy.addActionListener(e -> usunGodzinyPracy());
+        button7_15.addActionListener(e -> ustawGodzinyPracy7_15());
+        button8_16.addActionListener(e -> ustawGodzinyPracy8_16());
+        button9_17.addActionListener(e -> ustawGodzinyPracy9_17());
+        button10_18.addActionListener(e -> ustawGodzinyPracy10_18());
     }
+
+    private void zaladujDaneGodzinPracy(JTable tableGodziny, JPanel panel) {
+    }
+
 
     private void zaladujDane() {
         zaladujDanePracownikow();
         zaladujDaneDlaAut();
         zaladujDaneKlientow();
         zaladujRezerwacje();
+        // zaladujDaneGodzinPracy();
     }
 
     //<editor-fold desc="Pracownicy">
@@ -140,7 +183,9 @@ public class Main extends JFrame {
                 .stream()
                 .map(p -> new Object[]{p.getImie(), p.getNazwisko()})
                 .toArray(Object[][]::new);
+        DefaultTableModel defaultTableModel = new DefaultTableModel(data, columnNames);
         tablePracownicy.setModel(pracownikService.tabelaPracownicy());
+        comboBoxGodzinyPracyPracownicy.setModel(pracownikService.comboBoxPracownicy());
     }
 
     private void zaladujDaneWybranegoPracownika() {
@@ -218,7 +263,7 @@ public class Main extends JFrame {
 
         try {
             String pesel = textFieldPracownikPesel.getText();
-            if (pesel.length() != 11){
+            if (pesel.length() != 11) {
                 throw new Exception();
             }
         } catch (Exception ex) {
@@ -232,18 +277,18 @@ public class Main extends JFrame {
             boolean isLength = false;
             boolean isSpecialChar = false;
             String specialCharactersString = "!@#$%&*()'+,-./:;<=>?[]^_`{|}";
-            for (int i = 0; i < haslo.length(); i++){
-                if (Character.isUpperCase(haslo.charAt(i))){
+            for (int i = 0; i < haslo.length(); i++) {
+                if (Character.isUpperCase(haslo.charAt(i))) {
                     isUpperCase = true;
                 }
-                if (Character.isLowerCase(haslo.charAt(i))){
+                if (Character.isLowerCase(haslo.charAt(i))) {
                     isLowerCase = true;
                 }
-                if (specialCharactersString.contains(Character.toString(haslo.charAt(i)))){
+                if (specialCharactersString.contains(Character.toString(haslo.charAt(i)))) {
                     isSpecialChar = true;
                 }
             }
-            if (haslo.length() >= 8){
+            if (haslo.length() >= 8) {
                 isLength = true;
             }
             if (!isUpperCase || !isLowerCase || !isLength || !isSpecialChar) {
@@ -258,7 +303,7 @@ public class Main extends JFrame {
     }
 
     private Pracownik edytujDanePracownikaNaPodstawieInputu(Pracownik pracownik) {
-        if (!sprawdzInputPracownika()){
+        if (!sprawdzInputPracownika()) {
             return null;
         }
         pracownik.setImie(textFieldPracownikImie.getText());
@@ -318,7 +363,7 @@ public class Main extends JFrame {
         spinnerAutoCenaZaGodzine.setValue(1);
         textFieldAutoMarka.setText("");
         textFieldAutoModel.setText("");
-        spinnerAutoRokProdukcji.setValue(Calendar.getInstance().get(Calendar.YEAR)-5);
+        spinnerAutoRokProdukcji.setValue(Calendar.getInstance().get(Calendar.YEAR) - 5);
         comboBoxAutoNadwozie.setSelectedIndex(0);
         comboBoxAutoPaliwo.setSelectedIndex(0);
         comboBoxAutoSkrzynia.setSelectedIndex(0);
@@ -336,6 +381,8 @@ public class Main extends JFrame {
     }
 
     private boolean sprawdzInputUzytkownika() {
+
+
         if (textFieldAutoMarka.getText().length() < 3) {
             JOptionPane.showMessageDialog(panel, "Marka ma zbyt mało znaków");
             return false;
@@ -344,6 +391,8 @@ public class Main extends JFrame {
             JOptionPane.showMessageDialog(panel, "Model ma zbyt mało znaków");
             return false;
         }
+
+
         return true;
     }
 
@@ -413,4 +462,204 @@ public class Main extends JFrame {
     }
     private void zaladujRezerwacje(){ tableRezerwacje.setModel(wypozyczenieService.allWypozyczeniaTabela());}
 
+    private void zeorwanieGodzinPracy() {
+
+        textFieldPonidzialekOdGodzinyPracy.setText("");
+        textFieldPonidzialekDoGodzinyPracy.setText("");
+        textFieldWtorekOdGodzinyPracy.setText("");
+        textFieldWtorekDoGodzinyPracy.setText("");
+        textFieldSrodaOdGodzinyPracy.setText("");
+        textFieldSrodaDoGodzinyPracy.setText("");
+        textFieldCzwartekOdGodzinyPracy.setText("");
+        textFieldCzwartekDoGodzinyPracy.setText("");
+        textFieldPiatekOdGodzinyPracy.setText("");
+        textFieldPiatekDoGodzinyPracy.setText("");
+        textFieldSobotaOdGodzinyPracy.setText("");
+        textFieldSobotaDoGodzinyPracy.setText("");
+
+
+    }
+
+    private void uzupelnijInputDlaGodzinPracy(GodzinyPracy godzinyPracy) {
+
+        textFieldPonidzialekOdGodzinyPracy.setText(String.valueOf(godzinyPracy.getPoniedzialekOd()));
+        textFieldPonidzialekDoGodzinyPracy.setText(String.valueOf(godzinyPracy.getPoniedzialekDo()));
+        textFieldWtorekOdGodzinyPracy.setText(String.valueOf(godzinyPracy.getWtorekOd()));
+        textFieldWtorekDoGodzinyPracy.setText(String.valueOf(godzinyPracy.getWtorekDo()));
+        textFieldSrodaOdGodzinyPracy.setText(String.valueOf(godzinyPracy.getSrodaOd()));
+        textFieldSrodaDoGodzinyPracy.setText(String.valueOf(godzinyPracy.getSrodaDo()));
+        textFieldCzwartekOdGodzinyPracy.setText(String.valueOf(godzinyPracy.getCzwartekOd()));
+        textFieldCzwartekDoGodzinyPracy.setText(String.valueOf(godzinyPracy.getCzwartekDo()));
+        textFieldPiatekOdGodzinyPracy.setText(String.valueOf(godzinyPracy.getPiatekOd()));
+        textFieldPiatekDoGodzinyPracy.setText(String.valueOf(godzinyPracy.getPiatekDo()));
+        textFieldSobotaOdGodzinyPracy.setText(String.valueOf(godzinyPracy.getSobotaOd()));
+        textFieldSobotaDoGodzinyPracy.setText(String.valueOf(godzinyPracy.getSobotaDo()));
+
+    }
+
+
+    //private void zaladujDaneGodzinPracy(){ tableGodziny.setModel(GodzinyService.tabelaGodziny()); }
+
+    private void zaladujDaneSzukanychGodzin() {
+      try {
+          Integer idGodziny = Integer.valueOf(textFieldSzukajGodziny.getText());
+
+          showMessageDialog(null, "GodzinyPracy Pracownika nr:"+idGodziny);
+
+          Optional<GodzinyPracy> GodzinyOptional = repos.getGodzinyPracyRepository().findById(idGodziny);
+
+
+          if (GodzinyOptional.isEmpty()) {
+              showMessageDialog(null, "Brak takiej godziny!");
+          } else {
+              idWybranejGodzinyPracy = GodzinyPracy.getId(idGodziny);
+              uzupelnijInputDlaGodzin(GodzinyOptional.get());
+          }
+
+      }catch (NumberFormatException e )
+      {
+          showMessageDialog(null, "Muisz podać nunmer");
+      }
+
+    }
+
+    private GodzinyPracy uzupelnijInputDlaGodzin(GodzinyPracy godzinyPracy) {
+
+
+        textFieldPonidzialekOdGodzinyPracy.setText(String.valueOf(godzinyPracy.getPoniedzialekOd()));
+        textFieldPonidzialekDoGodzinyPracy.setText(String.valueOf(godzinyPracy.getPoniedzialekDo()));
+        textFieldWtorekOdGodzinyPracy.setText(String.valueOf(godzinyPracy.getWtorekOd()));
+        textFieldWtorekDoGodzinyPracy.setText(String.valueOf(godzinyPracy.getWtorekDo()));
+        textFieldSrodaOdGodzinyPracy.setText(String.valueOf(godzinyPracy.getSrodaOd()));
+        textFieldSrodaDoGodzinyPracy.setText(String.valueOf(godzinyPracy.getSrodaDo()));
+        textFieldCzwartekOdGodzinyPracy.setText(String.valueOf(godzinyPracy.getCzwartekOd()));
+        textFieldCzwartekDoGodzinyPracy.setText(String.valueOf(godzinyPracy.getCzwartekDo()));
+        textFieldPiatekOdGodzinyPracy.setText(String.valueOf(godzinyPracy.getPiatekOd()));
+        textFieldPiatekDoGodzinyPracy.setText(String.valueOf(godzinyPracy.getPiatekDo()));
+        textFieldSobotaOdGodzinyPracy.setText(String.valueOf(godzinyPracy.getSobotaOd()));
+        textFieldSobotaDoGodzinyPracy.setText(String.valueOf(godzinyPracy.getSobotaDo()));
+
+
+        return godzinyPracy;
+
+    }
+
+
+
+
+
+
+    private GodzinyPracy edytujGodzinyPracyNaPodstawieInputu(GodzinyPracy godzPracy) {
+
+
+
+        godzPracy.setPoniedzialekOd(LocalTime.of(Integer.parseInt(textFieldPonidzialekOdGodzinyPracy.getText()),0) );
+        godzPracy.setPoniedzialekDo(LocalTime.of(Integer.parseInt(textFieldPonidzialekDoGodzinyPracy.getText()),0) );
+        godzPracy.setWtorekOd(LocalTime.of(Integer.parseInt(textFieldWtorekOdGodzinyPracy.getText()),0) );
+        godzPracy.setWtorekDo(LocalTime.of(Integer.parseInt(textFieldWtorekDoGodzinyPracy.getText()),0) );
+        godzPracy.setSrodaOd(LocalTime.of(Integer.parseInt(textFieldSrodaOdGodzinyPracy.getText()),0) );
+        godzPracy.setSrodaDo(LocalTime.of(Integer.parseInt(textFieldSrodaDoGodzinyPracy.getText()),0) );
+        godzPracy.setCzwartekOd(LocalTime.of(Integer.parseInt(textFieldCzwartekOdGodzinyPracy.getText()),0) );
+        godzPracy.setCzwartekDo(LocalTime.of(Integer.parseInt(textFieldCzwartekDoGodzinyPracy.getText()),0) );
+        godzPracy.setPiatekOd(LocalTime.of(Integer.parseInt(textFieldPiatekOdGodzinyPracy.getText()),0) );
+        godzPracy.setPiatekDo(LocalTime.of(Integer.parseInt(textFieldPiatekDoGodzinyPracy.getText()),0) );
+        godzPracy.setSobotaOd(LocalTime.of(Integer.parseInt(textFieldSobotaDoGodzinyPracy.getText()),0) );
+        godzPracy.setSobotaDo(LocalTime.of(Integer.parseInt(textFieldSobotaDoGodzinyPracy.getText()),0) );
+
+
+
+        return godzPracy;
+
+    }
+
+    private void dodajGodzinyPracy() {
+       GodzinyPracy godzinyPracy = edytujGodzinyPracyNaPodstawieInputu(new GodzinyPracy());
+
+
+
+
+        repos.getGodzinyPracyRepository().save(godzinyPracy);
+
+
+        zeorwanieGodzinPracy();
+
+        showMessageDialog(null, "Dodano godziny pracy pracownika:"+godzinyPracy.getId());
+
+    }
+
+
+
+
+    private void edytujGodzinyPracy() {
+        Optional<GodzinyPracy> g = repos.getGodzinyPracyRepository().findById(idWybranejGodzinyPracy);
+        if (g.isEmpty()) {
+            showMessageDialog(null, "GodzinPracy nie ma w bazie");
+            return;
+        }
+        GodzinyPracy godzinyPracy = g.get();
+        edytujGodzinyPracyNaPodstawieInputu(godzinyPracy);
+        repos.getGodzinyPracyRepository().save(godzinyPracy);
+
+        zeorwanieGodzinPracy();
+        showMessageDialog(null, "Zedytowano godziny pracy pracownika:"+idWybranejGodzinyPracy);
+    }
+
+
+
+
+    private void usunGodzinyPracy() {
+        repos.getGodzinyPracyRepository().deleteById(idWybranejGodzinyPracy);
+
+        zeorwanieGodzinPracy();
+        showMessageDialog(null, "Usunięto godziny pracy Pracownika o id:"+ idWybranejGodzinyPracy);
+    }
+
+
+    private void czasPracy(int czasStart) {
+
+       // String czasPoczatkowy = czasStart + ":00";
+        //String czasKoncowy = czasStart + 8 + ":00";
+
+        int czasPoczatkowy = czasStart  ;
+        int czasKoncowy = czasStart + 8;
+
+        GodzinyPracy godzinyPracy = new GodzinyPracy(czasPoczatkowy, czasKoncowy);
+
+
+        textFieldPonidzialekOdGodzinyPracy.setText(String.valueOf(czasPoczatkowy));
+        textFieldWtorekOdGodzinyPracy.setText(String.valueOf(czasPoczatkowy));
+        textFieldSrodaOdGodzinyPracy.setText(String.valueOf(czasPoczatkowy));
+        textFieldCzwartekOdGodzinyPracy.setText(String.valueOf(czasPoczatkowy));
+        textFieldPiatekOdGodzinyPracy.setText(String.valueOf(czasPoczatkowy));
+        textFieldSobotaOdGodzinyPracy.setText(String.valueOf(czasPoczatkowy));
+
+        textFieldPonidzialekDoGodzinyPracy.setText(String.valueOf(czasKoncowy));
+        textFieldWtorekDoGodzinyPracy.setText(String.valueOf(czasKoncowy));
+        textFieldSrodaDoGodzinyPracy.setText(String.valueOf(czasKoncowy));
+        textFieldCzwartekDoGodzinyPracy.setText(String.valueOf(czasKoncowy));
+        textFieldPiatekDoGodzinyPracy.setText(String.valueOf(czasKoncowy));
+        textFieldSobotaDoGodzinyPracy.setText(String.valueOf(czasKoncowy));
+
+    }
+
+    private void ustawGodzinyPracy7_15() {
+
+        czasPracy(7);
+
+    }
+
+    private void ustawGodzinyPracy8_16() {
+        czasPracy(8);
+
+    }
+
+    private void ustawGodzinyPracy9_17() {
+        czasPracy(9);
+
+    }
+
+    private void ustawGodzinyPracy10_18() {
+        czasPracy(10);
+
+    }
 }

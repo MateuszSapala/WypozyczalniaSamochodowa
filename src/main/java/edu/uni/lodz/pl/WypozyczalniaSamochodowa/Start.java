@@ -43,6 +43,7 @@ public class Start implements CommandLineRunner {
         dodajPracownikow();
         dodajKlientow();
         dodajAuta();
+
     }
 
     private void dodajPracownikow() {
@@ -72,4 +73,6 @@ public class Start implements CommandLineRunner {
         Auto a2 = new Auto("Volkswagen", "Passat", Nadwozie.SEDAN, Paliwo.DIESEL, Skrzynia.MANUALNA, 2015, 100);
         repos.getAutoRepository().saveAll(List.of(a1, a2));
     }
+
+
 }

@@ -33,7 +33,7 @@ public class Start implements CommandLineRunner {
     public void run(String... args) {
         Logowanie logowanie = new Logowanie(repos);
         logowanie.setVisible(true);
-       //dodajDane();
+       dodajDane();
     }
 
     private void dodajDane() {

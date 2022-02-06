@@ -11,6 +11,7 @@ import org.springframework.util.NumberUtils;
 import javax.swing.*;
 import java.awt.*;
 import java.sql.PreparedStatement;
+import java.util.Arrays;
 import java.util.Optional;
 
 import static javax.swing.JOptionPane.showMessageDialog;
@@ -67,16 +68,16 @@ public class Rejestracja extends JFrame {
         else if(klientOptional1.isPresent()) {
             showMessageDialog(null, "Podany pesel jest już użyty przez innego użytkownika!");
         }
-        else if (textFieldImie.getText().isEmpty() || textFieldNazwisko.getText().isEmpty() || textFieldPesel.getText().isEmpty() || textFieldLogin.getText().isEmpty() || passwordField1.getText().isEmpty() || passwordField2.getText().isEmpty()) {
+        else if (textFieldImie.getText().isEmpty() || textFieldNazwisko.getText().isEmpty() || textFieldPesel.getText().isEmpty() || textFieldLogin.getText().isEmpty() || Arrays.toString(passwordField1.getPassword()).isEmpty() || Arrays.toString(passwordField2.getPassword()).isEmpty()) {
             showMessageDialog(null, "Wypełnij wszystkie pola!");
         }
-        else if (!(passwordField1.getText().equals(passwordField2.getText()))) {
+        else if (!(Arrays.toString(passwordField1.getPassword()).equals(Arrays.toString(passwordField2.getPassword())))) {
             showMessageDialog(null, "Podane hasło i powtórzone hasło nie są takie same!");
         }
-        else if(peselValidator(textFieldPesel.getText())==false){
+        else if(!peselValidator(textFieldPesel.getText())){
             showMessageDialog(null, "Błędny pesel!");
         }
-        else if(hasloValidator(passwordField1.getText())==false){
+        else if(!hasloValidator(Arrays.toString(passwordField1.getPassword()))){
             showMessageDialog(null,"Hasło musi zawierać od 8 do 20 znaków, minimum jedną małą literę, dużą literę, cyfrę i symbol!" );
         }
         else {
@@ -90,15 +91,10 @@ public class Rejestracja extends JFrame {
     private boolean peselValidator(String pesel) {
         if (pesel.length() != 11) {
             return false;
-        } else if (!(pesel.matches("[+-]?\\d*(\\.\\d+)?"))) {
-            return false;
-        } else {
-            return true;
-        }
+        } else return pesel.matches("[+-]?\\d*(\\.\\d+)?");
     }
     private boolean hasloValidator(String haslo){
-        if(!(haslo.matches( "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#&()–[{}]:;',?/*~$^+=<>]).{8,20}$"))) return false;
-        else return true;
+        return haslo.matches("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#&()–[{}]:;',?/*~$^+=<>]).{8,20}$");
     }
 }
 

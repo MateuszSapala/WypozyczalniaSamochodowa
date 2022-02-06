@@ -78,6 +78,8 @@ public class KlientForm extends JFrame {
 
         buttonRezerwuj.addActionListener(e->rezerwuj());
         buttonAnuluj.addActionListener(e->anuluj());
+
+        comboBoxSamochod.addActionListener(e -> policzKoszt());
     }
     private void uzupelnijDaneKontaKlienta(Klient klient) {
         textFieldImie.setText(klient.getImie());

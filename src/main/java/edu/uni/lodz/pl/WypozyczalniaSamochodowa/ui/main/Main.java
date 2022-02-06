@@ -16,8 +16,6 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.time.LocalTime;
@@ -25,6 +23,8 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 
+import static edu.uni.lodz.pl.WypozyczalniaSamochodowa.utils.Validators.hasloValidator;
+import static edu.uni.lodz.pl.WypozyczalniaSamochodowa.utils.Validators.peselValidator;
 import static javax.swing.JOptionPane.showMessageDialog;
 
 
@@ -39,7 +39,6 @@ public class Main extends JFrame {
 
     private Integer idWybranegoAuta;
     private Integer idWybranegoPracownika;
-
 
     //<editor-fold desc="UI">
     private JPanel panel;
@@ -64,7 +63,6 @@ public class Main extends JFrame {
     private JTextField textFieldPracownikNazwisko;
     private JTextField textFieldPracownikPesel;
     private JTextField textFieldPracownikLogin;
-    private JTextField textFieldPracownikHaslo;
     private JComboBox<Plec> comboBoxPracownikPlec;
     private JTable tableKlienci;
     private JTextField textFieldSzukajKlienta;
@@ -91,6 +89,7 @@ public class Main extends JFrame {
     private TimePicker timePickerPiatekDoGodzinyPracy;
     private TimePicker timePickerSobotaOdGodzinyPracy;
     private TimePicker timePickerSobotaDoGodzinyPracy;
+    private JPasswordField passwordFieldPracownikHaslo;
     private DefaultTableColumnModel model;
     private JLabel jlabel;
     private java.sql.Time Time;
@@ -120,6 +119,7 @@ public class Main extends JFrame {
         comboBoxAutoNadwozie.setModel(new DefaultComboBoxModel<Nadwozie>(Nadwozie.values()));
         comboBoxAutoPaliwo.setModel(new DefaultComboBoxModel<Paliwo>(Paliwo.values()));
         comboBoxAutoSkrzynia.setModel(new DefaultComboBoxModel<Skrzynia>(Skrzynia.values()));
+        comboBoxGodzinyPracyPracownicy.addActionListener(e -> zaladujDaneGodzinPracy());
         //</editor-fold>
 
         //<editor-fold desc="Buttons">
@@ -143,6 +143,13 @@ public class Main extends JFrame {
             }
         });
         buttonSzukajKlienta.addActionListener(e -> zaladujDaneSzukanegoKlienta());
+        buttonDodajGodzinyPracy.addActionListener(e -> dodajGodzinyPracy());
+        buttonEdytujGodzinyPracy.addActionListener(e -> edytujGodzinyPracy());
+        buttonUsuńGodzinyPracy.addActionListener(e -> usunGodzinyPracy());
+        button7_15.addActionListener(e -> czasPracy(7));
+        button8_16.addActionListener(e -> czasPracy(8));
+        button9_17.addActionListener(e -> czasPracy(9));
+        button10_18.addActionListener(e -> czasPracy(10));
         //</editor-fold>
 
         //<editor-fold desc="Spinners">
@@ -151,10 +158,13 @@ public class Main extends JFrame {
 
         JSpinner.DefaultEditor spinnerEditorAutoCenaZaGodzine = (JSpinner.DefaultEditor) (spinnerAutoCenaZaGodzine.getEditor());
         spinnerEditorAutoCenaZaGodzine.getTextField().setHorizontalAlignment(JTextField.LEFT);
-        JSpinner.DefaultEditor spinnerEditorAutoRokProdukcji = (JSpinner.DefaultEditor) (spinnerAutoRokProdukcji.getEditor());
+
+        spinnerAutoRokProdukcji.setEditor(new JSpinner.NumberEditor(spinnerAutoRokProdukcji, "#"));
+        JSpinner.NumberEditor spinnerEditorAutoRokProdukcji = (JSpinner.NumberEditor) (spinnerAutoRokProdukcji.getEditor());
         spinnerEditorAutoRokProdukcji.getTextField().setHorizontalAlignment(JTextField.LEFT);
         //</editor-fold>
 
+        //<editor-fold desc="Time pickers">
         timePickerPoniedzialekOdGodzinyPracy.getSettings().generatePotentialMenuTimes(TimePickerSettings.TimeIncrement.OneHour, LocalTime.of(6,0,0),LocalTime.of(20,0,0));;
         timePickerPoniedzialekDoGodzinyPracy.getSettings().generatePotentialMenuTimes(TimePickerSettings.TimeIncrement.OneHour, LocalTime.of(6,0,0),LocalTime.of(20,0,0));;
         timePickerWtorekOdGodzinyPracy.getSettings().generatePotentialMenuTimes(TimePickerSettings.TimeIncrement.OneHour, LocalTime.of(6,0,0),LocalTime.of(20,0,0));;
@@ -167,25 +177,8 @@ public class Main extends JFrame {
         timePickerPiatekDoGodzinyPracy.getSettings().generatePotentialMenuTimes(TimePickerSettings.TimeIncrement.OneHour, LocalTime.of(6,0,0),LocalTime.of(20,0,0));;
         timePickerSobotaOdGodzinyPracy.getSettings().generatePotentialMenuTimes(TimePickerSettings.TimeIncrement.OneHour, LocalTime.of(6,0,0),LocalTime.of(20,0,0));;
         timePickerSobotaDoGodzinyPracy.getSettings().generatePotentialMenuTimes(TimePickerSettings.TimeIncrement.OneHour, LocalTime.of(6,0,0),LocalTime.of(20,0,0));;
-
-        buttonDodajGodzinyPracy.addActionListener(e -> dodajGodzinyPracy());
-        buttonEdytujGodzinyPracy.addActionListener(e -> edytujGodzinyPracy());
-        buttonUsuńGodzinyPracy.addActionListener(e -> usunGodzinyPracy());
-        button7_15.addActionListener(e -> czasPracy(7));
-        button8_16.addActionListener(e -> czasPracy(8));
-        button9_17.addActionListener(e -> czasPracy(9));
-        button10_18.addActionListener(e -> czasPracy(10));
-        comboBoxGodzinyPracyPracownicy.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                zaladujDaneGodzinPracy();
-            }
-        });
+        //</editor-fold>
     }
-
-    private void zaladujDaneGodzinPracy(JTable tableGodziny, JPanel panel) {
-    }
-
 
     private void zaladujDane() {
         zaladujDanePracownikow();
@@ -223,7 +216,7 @@ public class Main extends JFrame {
         textFieldPracownikPesel.setText("");
         comboBoxPracownikPlec.setSelectedIndex(0);
         textFieldPracownikLogin.setText("");
-        textFieldPracownikHaslo.setText("");
+        passwordFieldPracownikHaslo.setText("");
         idWybranegoAuta = null;
     }
 
@@ -233,7 +226,7 @@ public class Main extends JFrame {
         textFieldPracownikPesel.setText(String.valueOf(p.getPesel()));
         comboBoxPracownikPlec.setSelectedItem(p.getPlec());
         textFieldPracownikLogin.setText(String.valueOf(p.getLogin()));
-        textFieldPracownikHaslo.setText(String.valueOf(p.getHaslo()));
+        passwordFieldPracownikHaslo.setText(String.valueOf(p.getHaslo()));
     }
 
     private void dodajPracownika() {
@@ -251,70 +244,24 @@ public class Main extends JFrame {
     }
 
     private boolean sprawdzInputPracownika() {
-        try {
-            String imie = textFieldPracownikImie.getText();
-            if (imie.length() < 2) {
-                throw new Exception();
-            }
-        } catch (Exception ex) {
+        if (textFieldPracownikImie.getText().length() < 2) {
             JOptionPane.showMessageDialog(panel, "Wprowadzone imie ma zbyt malo znakow!");
             return false;
         }
-
-        try {
-            String nazwisko = textFieldPracownikNazwisko.getText();
-            if (nazwisko.length() < 2) {
-                throw new Exception();
-            }
-        } catch (Exception ex) {
+        if (textFieldPracownikNazwisko.getText().length() < 2) {
             JOptionPane.showMessageDialog(panel, "Wprowadzone nazwisko ma zbyt malo znakow!");
             return false;
         }
-
-        try {
-            String pesel = textFieldPracownikPesel.getText();
-            Float floatPesel = Float.parseFloat(pesel);
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(panel, "Pesel musi skladac sie z samych cyfr!");
-            return false;
-        }
-
-        try {
-            String pesel = textFieldPracownikPesel.getText();
-            if (pesel.length() != 11) {
-                throw new Exception();
-            }
-        } catch (Exception ex) {
+        if (!peselValidator(textFieldPracownikPesel.getText())) {
             JOptionPane.showMessageDialog(panel, "Pesel musi byc ciagiem 11 cyfr!");
             return false;
         }
-        try {
-            String haslo = textFieldPracownikHaslo.getText();
-            boolean isUpperCase = false;
-            boolean isLowerCase = false;
-            boolean isLength = false;
-            boolean isSpecialChar = false;
-            String specialCharactersString = "!@#$%&*()'+,-./:;<=>?[]^_`{|}";
-            for (int i = 0; i < haslo.length(); i++) {
-                if (Character.isUpperCase(haslo.charAt(i))) {
-                    isUpperCase = true;
-                }
-                if (Character.isLowerCase(haslo.charAt(i))) {
-                    isLowerCase = true;
-                }
-                if (specialCharactersString.contains(Character.toString(haslo.charAt(i)))) {
-                    isSpecialChar = true;
-                }
-            }
-            if (haslo.length() >= 8) {
-                isLength = true;
-            }
-            if (!isUpperCase || !isLowerCase || !isLength || !isSpecialChar) {
-                throw new Exception();
-            }
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(panel, "Haslo powinno skladac sie z 8 znakow, w tym po jednej malej i" +
-                    " duzej literze oraz znaku specjalnego!");
+        if (textFieldPracownikLogin.getText().length() < 2) {
+            JOptionPane.showMessageDialog(panel, "Wprowadzone login ma zbyt malo znakow!");
+            return false;
+        }
+        if(!hasloValidator(String.copyValueOf(passwordFieldPracownikHaslo.getPassword()))){
+            JOptionPane.showMessageDialog(panel, "Haslo powinno skladac sie z 8 znakow, w tym po jednej malej i duzej literze oraz cyfry i znaku specjalnego!");
             return false;
         }
         return true;
@@ -329,7 +276,7 @@ public class Main extends JFrame {
         pracownik.setPesel(textFieldPracownikPesel.getText());
         pracownik.setPlec((Plec) comboBoxPracownikPlec.getSelectedItem());
         pracownik.setLogin(textFieldPracownikLogin.getText());
-        pracownik.setHaslo(textFieldPracownikHaslo.getText());
+        pracownik.setHaslo(String.copyValueOf(passwordFieldPracownikHaslo.getPassword()));
         return pracownik;
     }
 
@@ -454,9 +401,12 @@ public class Main extends JFrame {
     }
 
     private void usunAuto() {
-        repos.getAutoRepository().deleteById(idWybranegoAuta);
-        zaladujDaneDlaAut();
-        uzupelnijInputDlaAut();
+        try {
+            repos.getAutoRepository().deleteById(idWybranegoAuta);
+            zaladujDaneDlaAut();
+            uzupelnijInputDlaAut();
+        } catch (Exception ignored) {
+        }
     }
     //</editor-fold>
 

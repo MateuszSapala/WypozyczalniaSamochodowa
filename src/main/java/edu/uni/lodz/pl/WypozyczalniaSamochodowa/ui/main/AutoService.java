@@ -13,21 +13,19 @@ public class AutoService {
     private final Repos repos;
 
     public DefaultTableModel tabelaAuta() {
-        String[] columnNames = {"Id", "Cena za godzinę", "Marka", "Model", "Paliwo", "Rok produkcji", "Skrzynia"};
+        String[] columnNames = {"Id", "Cena za godzinę", "Marka", "Model", "Nadwozie", "Paliwo", "Rok produkcji", "Skrzynia"};
         Object[][] data = repos.getAutoRepository()
                 .findAll()
                 .stream()
-                .map(a -> new Object[]{a.getId(), a.getCenaZaGodzine(), a.getMarka(), a.getModel(), a.getPaliwo(), a.getRokProdukcji(), a.getSkrzynia()})
+                .map(a -> new Object[]{a.getId(), a.getCenaZaGodzine(), a.getMarka(), a.getModel(), a.getNadwozie().toString().toLowerCase(), a.getPaliwo().toString().toLowerCase(), a.getRokProdukcji(), a.getSkrzynia().toString().toLowerCase()})
                 .toArray(Object[][]::new);
         return new DefaultTableModel(data, columnNames);
     }
 
-    public DefaultComboBoxModel comboBoxAuta(){
+    public DefaultComboBoxModel<Auto> comboBoxAuta(){
         Auto[] autaArray = repos.getAutoRepository()
-                .findAll()
-                .stream()
-                .toArray(Auto[]::new);
-        return new DefaultComboBoxModel(autaArray);
+                .findAll().toArray(Auto[]::new);
+        return new DefaultComboBoxModel<Auto>(autaArray);
     }
 
     public Auto pobierzWybraneAutoZTabeli(JTable tableAuta, JPanel panel) {

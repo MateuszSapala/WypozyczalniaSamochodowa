@@ -13,12 +13,13 @@ import javax.persistence.*;
 @Setter
 @Entity
 public class Pracownik {
-    private String pesel;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private String imie;
     private String nazwisko;
+    @Column(unique = true)
+    private String pesel;
     @Column(unique = true)
     private String login;
     private String haslo;

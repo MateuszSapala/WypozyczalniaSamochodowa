@@ -13,4 +13,8 @@ public interface PracownikRepository extends JpaRepository<Pracownik, Integer> {
     //Działa dokładnie tak samo jak findAllByLoginAndPassword
     Optional<Pracownik> findByLoginAndHaslo(String login, String haslo);
 
+    Optional<Pracownik> findByLogin(String login);
+
+    Optional<Pracownik> findByPesel(String pesel);
+
 }

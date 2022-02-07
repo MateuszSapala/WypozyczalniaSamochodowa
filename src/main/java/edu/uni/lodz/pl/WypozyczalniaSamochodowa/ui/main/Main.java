@@ -114,6 +114,7 @@ public class Main extends JFrame {
         setLocationRelativeTo(null);
         this.setVisible(true);
 
+
         //<editor-fold desc="ComboBoxes">
         comboBoxPracownikPlec.setModel(new DefaultComboBoxModel<>(Plec.values()));
         comboBoxAutoNadwozie.setModel(new DefaultComboBoxModel<Nadwozie>(Nadwozie.values()));
@@ -129,7 +130,7 @@ public class Main extends JFrame {
         tablePracownicy.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                zaladujDaneWybranegoPracownika();
+                zaladujDaneWybranegoPracownika(); odblokujDodajEdytujPracownika();
             }
         });
 
@@ -235,16 +236,36 @@ public class Main extends JFrame {
             return;
         }
         try {
+            Optional<Pracownik> a = repos.getPracownikRepository().findByLogin(textFieldPracownikLogin.getText());
+            Optional<Pracownik> b = repos.getPracownikRepository().findByPesel(textFieldPracownikPesel.getText());
+            if(!(a.isEmpty())) {
+                JOptionPane.showMessageDialog(panel, "Podany login jest już zajęty!");
+                return;
+            }
+            else if(!(b.isEmpty())){
+                JOptionPane.showMessageDialog(panel, "Podany pesel jest już zajęty!");
+                return;
+            }
             repos.getPracownikRepository().save(pracownik);
         } catch (Exception e) {
             JOptionPane.showMessageDialog(panel, e.getMessage());
         }
+        zablokujDodajEdytujPracownika();
         zaladujDanePracownikow();
         uzupelnijInputDlaPracownika();
     }
+    private void odblokujDodajEdytujPracownika(){
+        buttonPracownicyEdytuj.setEnabled(true);
+        buttonPracownicyUsun.setEnabled(true);
+    }
+    private void zablokujDodajEdytujPracownika(){
+        buttonPracownicyEdytuj.setEnabled(false);
+        buttonPracownicyUsun.setEnabled(false);
+    }
 
     private boolean sprawdzInputPracownika() {
-        if (textFieldPracownikImie.getText().length() < 2) {
+
+            if (textFieldPracownikImie.getText().length() < 2) {
             JOptionPane.showMessageDialog(panel, "Wprowadzone imie ma zbyt malo znakow!");
             return false;
         }
@@ -257,7 +278,7 @@ public class Main extends JFrame {
             return false;
         }
         if (textFieldPracownikLogin.getText().length() < 2) {
-            JOptionPane.showMessageDialog(panel, "Wprowadzone login ma zbyt malo znakow!");
+            JOptionPane.showMessageDialog(panel, "Wprowadzony login ma zbyt malo znakow!");
             return false;
         }
         if(!hasloValidator(String.copyValueOf(passwordFieldPracownikHaslo.getPassword()))){
@@ -265,6 +286,7 @@ public class Main extends JFrame {
             return false;
         }
         return true;
+
     }
 
     private Pracownik edytujDanePracownikaNaPodstawieInputu(Pracownik pracownik) {
@@ -286,22 +308,39 @@ public class Main extends JFrame {
             JOptionPane.showMessageDialog(panel, "Pracownika nie ma w bazie");
             return;
         }
+
         Pracownik pracownik = p.get();
+        String login = pracownik.getLogin();
+        String pesel = pracownik.getPesel();
         pracownik = edytujDanePracownikaNaPodstawieInputu(pracownik);
         if (pracownik == null) {
             return;
         }
         try {
+            Optional<Pracownik> a = repos.getPracownikRepository().findByLogin(textFieldPracownikLogin.getText());
+            Optional<Pracownik> b = repos.getPracownikRepository().findByPesel(textFieldPracownikPesel.getText());
+            if(a.isPresent() && !login.equals(textFieldPracownikLogin.getText())) {
+                JOptionPane.showMessageDialog(panel, "Podany login jest już zajęty!");
+                return;
+            }
+            else if(b.isPresent() && !pesel.equals(textFieldPracownikPesel.getText())){
+                JOptionPane.showMessageDialog(panel, "Podany pesel jest już zajęty!");
+                return;
+            }
             repos.getPracownikRepository().save(pracownik);
         } catch (Exception e) {
             JOptionPane.showMessageDialog(panel, e.getMessage());
         }
+        zablokujDodajEdytujPracownika();
         zaladujDanePracownikow();
         uzupelnijInputDlaPracownika();
     }
 
     private void usunPracownika() {
+        Optional<GodzinyPracy> g = repos.getGodzinyPracyRepository().findById(idWybranegoPracownika);
+        if(g.isPresent()) { repos.getGodzinyPracyRepository().deleteById(idWybranegoPracownika);}
         repos.getPracownikRepository().deleteById(idWybranegoPracownika);
+        zablokujDodajEdytujPracownika();
         zaladujDanePracownikow();
         uzupelnijInputDlaPracownika();
     }

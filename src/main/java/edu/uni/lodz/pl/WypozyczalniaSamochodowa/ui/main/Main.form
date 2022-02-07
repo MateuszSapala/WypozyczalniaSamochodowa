@@ -54,12 +54,14 @@
                   <component id="2f879" class="javax.swing.JButton" binding="buttonPracownicyEdytuj">
                     <constraints/>
                     <properties>
+                      <enabled value="false"/>
                       <text value="Edytuj"/>
                     </properties>
                   </component>
                   <component id="a9cc4" class="javax.swing.JButton" binding="buttonPracownicyUsun">
                     <constraints/>
                     <properties>
+                      <enabled value="false"/>
                       <text value="Usun"/>
                     </properties>
                   </component>

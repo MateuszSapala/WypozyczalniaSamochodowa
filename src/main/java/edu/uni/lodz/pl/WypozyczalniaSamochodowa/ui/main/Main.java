@@ -238,11 +238,11 @@ public class Main extends JFrame {
         try {
             Optional<Pracownik> a = repos.getPracownikRepository().findByLogin(textFieldPracownikLogin.getText());
             Optional<Pracownik> b = repos.getPracownikRepository().findByPesel(textFieldPracownikPesel.getText());
-            if(!(a.isEmpty())) {
+            if(a.isPresent()) {
                 JOptionPane.showMessageDialog(panel, "Podany login jest już zajęty!");
                 return;
             }
-            else if(!(b.isEmpty())){
+            else if(b.isPresent()){
                 JOptionPane.showMessageDialog(panel, "Podany pesel jest już zajęty!");
                 return;
             }
@@ -265,7 +265,7 @@ public class Main extends JFrame {
 
     private boolean sprawdzInputPracownika() {
 
-            if (textFieldPracownikImie.getText().length() < 2) {
+        if (textFieldPracownikImie.getText().length() < 2) {
             JOptionPane.showMessageDialog(panel, "Wprowadzone imie ma zbyt malo znakow!");
             return false;
         }
@@ -338,7 +338,7 @@ public class Main extends JFrame {
 
     private void usunPracownika() {
         Optional<GodzinyPracy> g = repos.getGodzinyPracyRepository().findById(idWybranegoPracownika);
-        if(g.isPresent()) { repos.getGodzinyPracyRepository().deleteById(idWybranegoPracownika);}
+        g.ifPresent(godziny -> repos.getGodzinyPracyRepository().deleteById(godziny.getId()));
         repos.getPracownikRepository().deleteById(idWybranegoPracownika);
         zablokujDodajEdytujPracownika();
         zaladujDanePracownikow();
@@ -371,6 +371,8 @@ public class Main extends JFrame {
         comboBoxAutoPaliwo.setSelectedIndex(0);
         comboBoxAutoSkrzynia.setSelectedIndex(0);
         idWybranegoAuta = null;
+        buttonAutaEdytuj.setEnabled(false);
+        buttonAutaUsun.setEnabled(false);
     }
 
     private void uzupelnijInputDlaAut(Auto auto) {
@@ -381,6 +383,8 @@ public class Main extends JFrame {
         comboBoxAutoNadwozie.setSelectedItem(auto.getNadwozie());
         comboBoxAutoPaliwo.setSelectedItem(auto.getPaliwo());
         comboBoxAutoSkrzynia.setSelectedItem(auto.getSkrzynia());
+        buttonAutaEdytuj.setEnabled(true);
+        buttonAutaUsun.setEnabled(true);
     }
 
     private boolean sprawdzInputUzytkownika() {
@@ -424,6 +428,10 @@ public class Main extends JFrame {
     }
 
     private void edytujAuto() {
+        if(idWybranegoAuta==null){
+            JOptionPane.showMessageDialog(panel, "Nie wybrano auta");
+            return;
+        }
         Optional<Auto> a = repos.getAutoRepository().findById(idWybranegoAuta);
         if (a.isEmpty()) {
             JOptionPane.showMessageDialog(panel, "Auta nie ma w bazie");
@@ -440,6 +448,14 @@ public class Main extends JFrame {
     }
 
     private void usunAuto() {
+        if(idWybranegoAuta==null){
+            JOptionPane.showMessageDialog(panel, "Nie wybrano auta");
+            return;
+        }
+        if(!repos.getWypozyczenieRepository().findByAutoId(idWybranegoAuta).isEmpty()){
+            JOptionPane.showMessageDialog(panel, "Nie można usunąc auta, które ma wypozyczenie");
+            return;
+        }
         try {
             repos.getAutoRepository().deleteById(idWybranegoAuta);
             zaladujDaneDlaAut();
@@ -545,20 +561,23 @@ public class Main extends JFrame {
     }
 
     private void dodajGodzinyPracy() {
+        if(comboBoxGodzinyPracyPracownicy.getSelectedItem()==null){
+            showMessageDialog(null, "Nie wybrano pracownika");
+            return;
+        }
         GodzinyPracy godzinyPracy = edytujGodzinyPracyNaPodstawieInputu(new GodzinyPracy());
         if(!godzinyWprowadzonePrawidlowo(godzinyPracy)){
             showMessageDialog(null, "Godziny muszą być uzypełnone oraz godziny rozpoczęcia muszą być przed godzinami zakończenia");
             return;
         }
         repos.getGodzinyPracyRepository().save(godzinyPracy);
-        showMessageDialog(null, "Dodano godziny pracy pracownika:" + godzinyPracy.getId());
         zaladujDaneGodzinPracy();
     }
 
     private void edytujGodzinyPracy() {
         Optional<GodzinyPracy> g = repos.getGodzinyPracyRepository().findByPracownik((Pracownik) comboBoxGodzinyPracyPracownicy.getSelectedItem());
         if (g.isEmpty()) {
-            showMessageDialog(null, "GodzinPracy nie ma w bazie");
+            showMessageDialog(null, "Podany pracownik nie ma godzin pracy");
             return;
         }
         GodzinyPracy godzinyPracy = g.get();
@@ -575,6 +594,7 @@ public class Main extends JFrame {
     private void usunGodzinyPracy() {
         Optional<GodzinyPracy> godzinyPracyOptional = repos.getGodzinyPracyRepository().findByPracownik((Pracownik) comboBoxGodzinyPracyPracownicy.getSelectedItem());
         if(godzinyPracyOptional.isEmpty()){
+            showMessageDialog(null, "Podany pracownik nie ma godzin pracy");
             return;
         }
         repos.getGodzinyPracyRepository().deleteById(godzinyPracyOptional.get().getId());

@@ -201,9 +201,8 @@ public class KlientForm extends JFrame {
 
     private void anuluj() {
         Wypozyczenie wypozyczenie = pobierzWypozyczenieZTabeli(tableWypozyczenie);
-        if(Objects.nonNull(wypozyczenie)) {
-            wypozyczenie.setAuto(null);
-            wypozyczenie.setKlient(null);
+        if (wypozyczenie == null) {
+            return;
         }
         repos.getWypozyczenieRepository().deleteById(wypozyczenie.getId());
         zaladujWypozyczeniaKlienta();

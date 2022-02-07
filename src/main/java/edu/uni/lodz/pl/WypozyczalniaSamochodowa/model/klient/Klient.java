@@ -5,10 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @NoArgsConstructor
 @Getter
@@ -20,7 +17,9 @@ public class Klient {
     private Integer id;
     private String imie;
     private String nazwisko;
+    @Column(unique = true)
     private String pesel;
+    @Column(unique = true)
     private String login;
     private String haslo;
     private Plec plec;

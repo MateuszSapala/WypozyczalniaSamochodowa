@@ -592,12 +592,14 @@
                   <component id="716bc" class="javax.swing.JButton" binding="buttonAutaEdytuj">
                     <constraints/>
                     <properties>
+                      <enabled value="false"/>
                       <text value="Edytuj"/>
                     </properties>
                   </component>
                   <component id="d8045" class="javax.swing.JButton" binding="buttonAutaUsun">
                     <constraints/>
                     <properties>
+                      <enabled value="false"/>
                       <text value="Usuń"/>
                     </properties>
                   </component>

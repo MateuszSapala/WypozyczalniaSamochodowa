@@ -62,8 +62,8 @@ public class Start implements CommandLineRunner {
         Klient k2 = new Klient("Jan", "Pach", "27650193845", "user2", "Passuser2!", Plec.MEZCZYZNA);
         repos.getKlientRepository().saveAll(List.of(k1, k2));
 
-        Auto a1 = new Auto("Audi", "A7", Nadwozie.SEDAN, Paliwo.BENZYNA, Skrzynia.AUTOMATYCZNA, 2020, 150);
-        Auto a2 = new Auto("Volkswagen", "Passat", Nadwozie.SEDAN, Paliwo.DIESEL, Skrzynia.MANUALNA, 2015, 100);
+        Auto a1 = new Auto("Audi", "A7", Nadwozie.SEDAN, Paliwo.BENZYNA, Skrzynia.AUTOMATYCZNA, 2020, 6);
+        Auto a2 = new Auto("Volkswagen", "Passat", Nadwozie.SEDAN, Paliwo.DIESEL, Skrzynia.MANUALNA, 2015, 4);
         repos.getAutoRepository().saveAll(List.of(a1, a2));
 
         Wypozyczenie w1 = new Wypozyczenie(LocalDateTime.of(2022, 4, 14, 8, 0, 0), LocalDateTime.of(2022, 4, 21, 8, 0, 0), k1, a1, 7 * a1.getCenaZaGodzine() * 24);
